@@ -54,7 +54,8 @@ jspm_packages/
 
 # Output of 'npm pack'
 *.tgz
-
+# Astro output
+.astro
 # Yarn Integrity file
 .yarn-integrity
 
