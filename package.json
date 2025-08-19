@@ -1,0 +1,63 @@
+{
+  "name": "@sofidev/astro-dynamic-header",
+  "version": "1.0.0",
+  "description": "A dynamic Astro header component that switches between floating and fullscreen styles",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./Header": "./src/Header.astro",
+    "./NavMenu": "./src/NavMenu.astro",
+    "./MobileNav": "./src/MobileNav.astro",
+    "./HamburgerButton": "./src/HamburgerButton.astro",
+    "./Header.astro": "./src/Header.astro",
+    "./NavMenu.astro": "./src/NavMenu.astro",
+    "./MobileNav.astro": "./src/MobileNav.astro",
+    "./HamburgerButton.astro": "./src/HamburgerButton.astro"
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "astro-package build",
+    "dev": "astro-package dev",
+    "check": "astro check",
+    "check:watch": "astro check --watch"
+  },
+  "keywords": [
+    "astro",
+    "component",
+    "header",
+    "navigation",
+    "responsive",
+    "typescript",
+    "dynamic",
+    "floating",
+    "sofidev",
+    "fullscreen"
+  ],
+  "author": "SofiDev contact@sofidev.top",
+  "license": "MIT",
+  "peerDependencies": {
+    "astro": "^4.0.0 || ^5.0.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.0",
+    "astro": "^5.12.8",
+    "typescript": "^5.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SofiDevO/astro-dynamic-header.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SofiDevO/astro-dynamic-header/issues"
+  },
+  "homepage": "https://github.com/SofiDevO/astro-dynamic-header#readme"
+}

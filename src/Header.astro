@@ -1,0 +1,150 @@
+---
+import HamburgerButton from "./HamburgerButton.astro";
+import NavMenu from "./NavMenu.astro";
+import MobileNav from "./MobileNav.astro";
+
+export interface Props {
+  headerType?: "floating" | "fullscreen";
+  logoSrc?: string;
+  logoAlt?: string;
+  logoWidth?: string;
+  homeUrl?: string;
+  menuItems?: Array<{
+    link: string;
+    text: string;
+    submenu?: Array<{
+      link: string;
+      text: string;
+      submenu?: Array<{
+        link: string;
+        text: string;
+      }>;
+    }>;
+  }>;
+  backgroundColor?: string;
+  backdropBlur?: string;
+  zIndex?: number;
+}
+
+const {
+  headerType = "floating",
+  logoSrc = "/logo.png",
+  logoAlt = "Logo",
+  logoWidth = "120px",
+  homeUrl = "/",
+  menuItems = [],
+  backgroundColor = "#0d0d0dcc",
+  backdropBlur = "blur(20px)",
+  zIndex = 10
+} = Astro.props;
+---
+
+<script>
+  class HamburgerController {
+    private hamburgerBtn: HTMLElement | null;
+    private mobileMenu: HTMLElement | null;
+
+    constructor() {
+      this.hamburgerBtn = document.getElementById("hamburger-btn");
+      this.mobileMenu = document.getElementById("mobile-header-menu");
+      this.init();
+    }
+
+    private init(): void {
+      if (this.hamburgerBtn && this.mobileMenu) {
+        this.hamburgerBtn.addEventListener("click", () => this.toggleMenu());
+      }
+    }
+
+    private toggleMenu(): void {
+      if (this.hamburgerBtn && this.mobileMenu) {
+        this.hamburgerBtn.classList.toggle("is-active");
+        this.mobileMenu.classList.toggle("is-active");
+      }
+    }
+  }
+
+  // Auto-initialize when DOM is ready
+  document.addEventListener('DOMContentLoaded', () => {
+    new HamburgerController();
+  });
+</script>
+
+<div class={`header__container header__container--${headerType}`} style={`z-index: ${zIndex};`}>
+  <header class={`header header--${headerType}`} style={`background-color: ${backgroundColor}; backdrop-filter: ${backdropBlur}; -webkit-backdrop-filter: ${backdropBlur};`}>
+    <a href={homeUrl}>
+      <img class="header__logo" src={logoSrc} alt={logoAlt} style={`width: ${logoWidth};`} />
+    </a>
+    <NavMenu menuItems={menuItems} />
+    <HamburgerButton />
+    <MobileNav menuItems={menuItems} />
+  </header>
+</div>
+
+<style>
+  /* Base styles for header container */
+  .header__container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    position: fixed;
+
+    @media (width < 768px) {
+      justify-content: flex-end;
+      align-items: flex-end;
+    }
+  }
+
+  /* Floating header container styles */
+  .header__container--floating {
+    padding: 16px;
+  }
+
+  /* Fullscreen header container styles */
+  .header__container--fullscreen {
+    padding: 0;
+  }
+
+  /* Base styles for header */
+  .header {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: space-between;
+
+    @media (width < 768px) {
+      align-self: flex-end;
+      padding: 0.4rem;
+      margin: 0 auto;
+    }
+  }
+
+  /* Floating header styles */
+  .header--floating {
+    max-width: 1100px;
+    border-radius: 18px;
+    padding: 0.5rem 1rem;
+
+    @media (width < 768px) {
+      max-width: 95%;
+    }
+  }
+
+  /* Fullscreen header styles */
+  .header--fullscreen {
+    border-radius: 0;
+    padding: 1rem 2rem;
+
+    @media (width < 768px) {
+      max-width: 100%;
+      padding: 0.8rem 1rem;
+    }
+  }
+
+  .header__logo {
+    margin-right: 1rem;
+    object-fit: contain;
+  }
+</style>
