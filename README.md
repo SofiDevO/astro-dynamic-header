@@ -1,4 +1,4 @@
-# @sofidev/astro-dynamic-header
+# @sofidevo/astro-dynamic-header
 
 A dynamic, responsive header component for Astro projects that can switch between floating and fullscreen styles with multi-level dropdown navigation support.
 
@@ -11,10 +11,14 @@ A dynamic, responsive header component for Astro projects that can switch betwee
 - 🎨 **Customizable**: Extensive customization options for colors, sizes, and behavior
 - ⚡ **Astro Optimized**: Built specifically for Astro framework
 
+
+### Live demo
+  [https://base-astro-psi.vercel.app/fullscreen-demo](https://base-astro-psi.vercel.app/fullscreen-demo)
+
 ## Installation
 
 ```bash
-npm install @sofidev/astro-dynamic-header
+ npm i @sofidevo/astro-dynamic-header
 ```
 
 ## Quick Start
@@ -23,7 +27,7 @@ npm install @sofidev/astro-dynamic-header
 
 ```astro
 ---
-import Header from '@sofidev/astro-dynamic-header/Header.astro';
+import Header from '@sofidevo/astro-dynamic-header/Header.astro';
 
 const menuItems = [
   { link: '/about', text: 'About' },
@@ -42,7 +46,7 @@ const menuItems = [
 
 ```astro
 ---
-import Header from '@sofidev/astro-dynamic-header/Header.astro';
+import Header from '@sofidevo/astro-dynamic-header/Header.astro';
 
 const menuItems = [
   {
@@ -126,9 +130,9 @@ You can also import and use components individually:
 
 ```astro
 ---
-import NavMenu from '@sofidev/astro-dynamic-header/NavMenu.astro';
-import MobileNav from '@sofidev/astro-dynamic-header/MobileNav.astro';
-import HamburgerButton from '@sofidev/astro-dynamic-header/HamburgerButton.astro';
+import NavMenu from '@sofidevo/astro-dynamic-header/NavMenu.astro';
+import MobileNav from '@sofidevo/astro-dynamic-header/MobileNav.astro';
+import HamburgerButton from '@sofidevo/astro-dynamic-header/HamburgerButton.astro';
 ---
 
 <NavMenu menuItems={menuItems} showHomeLink={true} homeText="Home" />
@@ -159,7 +163,7 @@ import type {
   NavMenuProps,
   MobileNavProps,
   HamburgerButtonProps
-} from '@sofidev/astro-dynamic-header';
+} from '@sofidevo/astro-dynamic-header';
 ```
 
 ## Browser Support
