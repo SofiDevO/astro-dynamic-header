@@ -77,7 +77,7 @@ const {
     </a>
     <NavMenu menuItems={menuItems} />
     <HamburgerButton />
-    <MobileNav menuItems={menuItems} />
+    <MobileNav menuItems={menuItems}  type={headerType} />
   </header>
 </div>
 
@@ -146,5 +146,10 @@ const {
   .header__logo {
     margin-right: 1rem;
     object-fit: contain;
+  }
+
+  /* Adjust transform for fullscreen header */
+  .header--fullscreen .mobile-header__menu.is-active {
+    transform: translate(0%);
   }
 </style>

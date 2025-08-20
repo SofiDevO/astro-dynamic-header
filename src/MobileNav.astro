@@ -1,5 +1,6 @@
 ---
 export interface Props {
+  type?: "floating" | "fullscreen";
   menuItems?: Array<{
     link: string;
     text: string;
@@ -9,6 +10,7 @@ export interface Props {
       submenu?: Array<{
         link: string;
         text: string;
+
       }>;
     }>;
   }>;
@@ -16,6 +18,8 @@ export interface Props {
   homeText?: string;
   accentColor?: string;
 }
+
+const  {type} = Astro.props;
 
 const {
   menuItems = [],
@@ -27,7 +31,7 @@ const {
 const pagePathname = Astro.url.pathname;
 ---
 
-<nav class="mobile-header__menu" id="mobile-header-menu" style={`--mobile-accent-color: ${accentColor};`}>
+<nav class={`mobile-header__menu mobile-header__menu--${type}`} id="mobile-header-menu" style={`--mobile-accent-color: ${accentColor};`}>
   <ol class="mobile-menu">
     {showHomeLink && pagePathname !== "/" && (
       <li class="header__item mobile-header__item">
@@ -188,6 +192,11 @@ const pagePathname = Astro.url.pathname;
 
   .mobile-header__menu.is-active {
     transform: translateX(-7%);
+  }
+
+  /* Adjust transform for fullscreen header */
+  .mobile-header__menu--fullscreen.is-active {
+    transform: translate(0%);
   }
 
   .menu__summary {
