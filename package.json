@@ -1,6 +1,6 @@
 {
   "name": "@sofidevo/astro-dynamic-header",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "A dynamic Astro header component that switches between floating and fullscreen styles",
   "type": "module",
   "main": "./src/index.ts",
