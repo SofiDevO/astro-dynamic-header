@@ -56,12 +56,26 @@ export class HamburgerButtonController {
     document.addEventListener("click", (e: Event) => {
       const target = e.target as Element;
 
-      // Check if the clicked element is a menu link (following original logic pattern)
-      if (target?.matches?.(".mobile-menu__link") ||
-          target?.matches?.(".menu__link.mobile-menu__link") ||
-          target?.matches?.(".mobile-menu__link *") ||
-          target?.matches?.(".menu__link.mobile-menu__link *")) {
-        this.closeMenu();
+      // Check if the clicked element is within the mobile menu
+      const mobileMenu = document.getElementById("mobile-header-menu");
+      if (!mobileMenu || !mobileMenu.contains(target)) {
+        return;
+      }
+
+      // Check if the clicked element is a menu link (including all mobile menu variants)
+      const isMenuLink = target?.matches?.(".mobile-menu__link") ||
+                        target?.matches?.(".menu__link.mobile-menu__link") ||
+                        target?.closest?.(".mobile-menu__link") ||
+                        target?.closest?.(".menu__link.mobile-menu__link");
+
+      if (isMenuLink) {
+        // Only close if it's an actual link with a valid href (not a summary/dropdown toggle)
+        const closestLink = target.closest("a");
+        if (closestLink && closestLink.href &&
+            closestLink.href !== "#" &&
+            !closestLink.href.endsWith("#")) {
+          this.closeMenu();
+        }
       }
     });
   }
