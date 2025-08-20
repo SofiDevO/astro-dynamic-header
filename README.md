@@ -27,7 +27,11 @@ A dynamic, responsive header component for Astro projects that can switch betwee
 
 ```astro
 ---
-import Header from '@sofidevo/astro-dynamic-header/Header.astro';
+// Option 1: Import from direct subpath (recommended)
+import Header from '@sofidevo/astro-dynamic-header/Header';
+
+// Option 2: Import from main entry point with types
+import { HeaderProps, type MenuItemType } from '@sofidevo/astro-dynamic-header';
 
 const menuItems = [
   { link: '/about', text: 'About' },
@@ -42,11 +46,29 @@ const menuItems = [
 />
 ```
 
+### TypeScript Configuration
+
+To ensure imports work correctly in your Astro project, make sure your `tsconfig.json` has the appropriate configuration:
+
+```json
+{
+  "compilerOptions": {
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "strict": true,
+    "noEmit": true,
+    "jsx": "preserve"
+  },
+  "extends": "astro/tsconfigs/strict"
+}
+```
+
 ### Advanced Usage
 
 ```astro
 ---
-import Header from '@sofidevo/astro-dynamic-header/Header.astro';
+import Header from '@sofidevo/astro-dynamic-header/Header';
+import type { MenuItemType } from '@sofidevo/astro-dynamic-header';
 
 const menuItems = [
   {
@@ -130,6 +152,12 @@ You can also import and use components individually:
 
 ```astro
 ---
+// Import individual components
+import NavMenu from '@sofidevo/astro-dynamic-header/NavMenu';
+import MobileNav from '@sofidevo/astro-dynamic-header/MobileNav';
+import HamburgerButton from '@sofidevo/astro-dynamic-header/HamburgerButton';
+
+// Or use the .astro extension explicitly
 import NavMenu from '@sofidevo/astro-dynamic-header/NavMenu.astro';
 import MobileNav from '@sofidevo/astro-dynamic-header/MobileNav.astro';
 import HamburgerButton from '@sofidevo/astro-dynamic-header/HamburgerButton.astro';
@@ -172,6 +200,43 @@ import type {
 - Mobile responsive design
 - Supports CSS `backdrop-filter`
 - Graceful degradation for older browsers
+
+## Troubleshooting
+
+### Import Issues
+
+If you encounter import errors, try these solutions:
+
+1. **Use direct subpath import:**
+   ```astro
+   import Header from '@sofidevo/astro-dynamic-header/Header';
+   ```
+
+2. **Verify TypeScript configuration:**
+   ```json
+   // tsconfig.json
+   {
+     "compilerOptions": {
+       "moduleResolution": "bundler", // or "nodenext"
+       "allowImportingTsExtensions": true
+     }
+   }
+   ```
+
+3. **Import types separately:**
+   ```astro
+   ---
+   import Header from '@sofidevo/astro-dynamic-header/Header';
+   import type { MenuItemType } from '@sofidevo/astro-dynamic-header';
+   ---
+   ```
+
+### Compatibility
+
+- ✅ Astro 4.x and 5.x
+- ✅ SSG Projects (Static Site Generation)
+- ✅ SSR Projects (Server-Side Rendering)
+- ✅ Hybrid Projects (output: 'hybrid')
 
 ## Live Examples
 

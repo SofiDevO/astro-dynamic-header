@@ -1,14 +1,14 @@
 {
   "name": "@sofidevo/astro-dynamic-header",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "description": "A dynamic Astro header component that switches between floating and fullscreen styles",
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
     },
     "./Header": "./src/Header.astro",
     "./NavMenu": "./src/NavMenu.astro",
@@ -20,13 +20,12 @@
     "./HamburgerButton.astro": "./src/HamburgerButton.astro"
   },
   "files": [
-    "dist",
     "src",
     "README.md"
   ],
   "scripts": {
-    "build": "astro-package build",
-    "dev": "astro-package dev",
+    "build": "astro build",
+    "dev": "astro dev",
     "check": "astro check",
     "check:watch": "astro check --watch"
   },

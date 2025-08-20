@@ -43,8 +43,81 @@ const pagePathname = Astro.url.pathname;
     });
   }
 
+  function handleSubsubmenuInteraction() {
+    const parentItems = document.querySelectorAll('.submenu__item--secondary');
+
+    parentItems.forEach((parentItem) => {
+      const subsubmenu = parentItem.querySelector('.subsubmenu');
+
+      if (subsubmenu) {
+        const adjustPosition = () => {
+          const viewportWidth = window.innerWidth;
+
+          const originalDisplay = (subsubmenu as HTMLElement).style.display;
+          const originalVisibility = (subsubmenu as HTMLElement).style.visibility;
+
+          (subsubmenu as HTMLElement).style.display = "block";
+          (subsubmenu as HTMLElement).style.visibility = "hidden";
+          (subsubmenu as HTMLElement).style.left = "100%";
+          (subsubmenu as HTMLElement).style.transform = "";
+
+          const rect = subsubmenu.getBoundingClientRect();
+
+          if (rect.right > viewportWidth) {
+            (subsubmenu as HTMLElement).style.left = "-220%";
+            const leftRect = subsubmenu.getBoundingClientRect();
+
+            if (leftRect.left < 0) {
+              (subsubmenu as HTMLElement).style.left = "100%";
+              const overflow = rect.right - viewportWidth + 30;
+              (subsubmenu as HTMLElement).style.transform = `translateX(-${overflow}px)`;
+            }
+          }
+          (subsubmenu as HTMLElement).style.display = originalDisplay;
+          (subsubmenu as HTMLElement).style.visibility = originalVisibility;
+        };
+
+        const showSubsubmenu = () => {
+          adjustPosition();
+
+          (subsubmenu as HTMLElement).style.opacity = "1";
+          (subsubmenu as HTMLElement).style.pointerEvents = "all";
+
+          const isPositionedLeft = (subsubmenu as HTMLElement).style.left === "-100%";
+          const transformDirection = isPositionedLeft ? "-1rem" : "2.5rem";
+
+          const currentTransform = (subsubmenu as HTMLElement).style.transform;
+          if (currentTransform && currentTransform.includes("translateX")) {
+            const existingTranslate = currentTransform.match(
+              /translateX\(([^)]+)\)/
+            );
+            if (existingTranslate) {
+              const existingValue = existingTranslate[1];
+              (subsubmenu as HTMLElement).style.transform = `translateX(calc(${existingValue} + ${transformDirection}))`;
+            }
+          } else {
+            (subsubmenu as HTMLElement).style.transform =
+              `${currentTransform} translateX(${transformDirection})`.trim();
+          }
+        };
+
+        const hideSubsubmenu = () => {
+          (subsubmenu as HTMLElement).style.opacity = "";
+          (subsubmenu as HTMLElement).style.pointerEvents = "";
+          (subsubmenu as HTMLElement).style.transform = "";
+        };
+
+        parentItem.addEventListener("mouseenter", showSubsubmenu);
+        parentItem.addEventListener("mouseleave", hideSubsubmenu);
+      }
+    });
+  }
+
   window.addEventListener('resize', adjustSubsubmenuPositionOnResize);
-  document.addEventListener('DOMContentLoaded', adjustSubsubmenuPositionOnResize);
+  document.addEventListener('DOMContentLoaded', () => {
+    adjustSubsubmenuPositionOnResize();
+    handleSubsubmenuInteraction();
+  });
 </script>
 
 <nav class="header__menu" id="header-menu">
