@@ -1,5 +1,4 @@
-// TypeScript utilities
-export { HamburgerButton } from './hamburger.ts';
+
 
 // Types
 export interface MenuItemType {
