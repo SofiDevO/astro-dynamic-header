@@ -64,7 +64,8 @@ const pagePathname = Astro.url.pathname;
           const rect = subsubmenu.getBoundingClientRect();
 
           if (rect.right > viewportWidth) {
-            (subsubmenu as HTMLElement).style.left = "-220%";
+            (subsubmenu as HTMLElement).style.left = "-200%";
+            (subsubmenu as HTMLElement).style.right = "auto";
             const leftRect = subsubmenu.getBoundingClientRect();
 
             if (leftRect.left < 0) {
@@ -340,7 +341,6 @@ const pagePathname = Astro.url.pathname;
   .submenu li:hover > .subsubmenu {
     opacity: 1;
     pointer-events: all;
-    right: 0;
   }
 
   .submenu li:hover > .subsubmenu::before {
