@@ -1,6 +1,6 @@
 {
   "name": "@sofidevo/astro-dynamic-header",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "description": "A dynamic Astro header component that switches between floating and fullscreen styles",
   "type": "module",
   "main": "./src/index.ts",
@@ -61,6 +61,5 @@
     "url": "https://github.com/SofiDevO/astro-dynamic-header/issues"
   },
   "homepage": "https://github.com/SofiDevO/astro-dynamic-header#readme",
-
   "demo": "https://base-astro-psi.vercel.app/fullscreen-demo"
 }
