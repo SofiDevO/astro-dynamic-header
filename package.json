@@ -1,6 +1,6 @@
 {
   "name": "@sofidevo/astro-dynamic-header",
-  "version": "1.0.17",
+  "version": "1.0.19",
   "description": "A dynamic Astro header component that switches between floating and fullscreen styles",
   "type": "module",
   "main": "./src/index.ts",
@@ -27,7 +27,10 @@
     "build": "astro build",
     "dev": "astro dev",
     "check": "astro check",
-    "check:watch": "astro check --watch"
+    "check:watch": "astro check --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "keywords": [
     "astro",
@@ -50,8 +53,12 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.0",
+    "@types/jsdom": "^21.1.7",
+    "@vitest/coverage-v8": "^3.2.4",
     "astro": "^5.12.8",
-    "typescript": "^5.0.0"
+    "jsdom": "^26.1.0",
+    "typescript": "^5.0.0",
+    "vitest": "^3.2.4"
   },
   "repository": {
     "type": "git",
@@ -60,6 +67,5 @@
   "bugs": {
     "url": "https://github.com/SofiDevO/astro-dynamic-header/issues"
   },
-  "homepage": "https://github.com/SofiDevO/astro-dynamic-header#readme",
-  "demo": "https://base-astro-psi.vercel.app/fullscreen-demo"
+  "homepage": "https://base-astro-psi.vercel.app/fullscreen-demo"
 }

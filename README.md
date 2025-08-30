@@ -146,27 +146,6 @@ interface MenuItemType {
 - Edge-to-edge design
 - Ideal for traditional website layouts
 
-## Individual Components
-
-You can also import and use components individually:
-
-```astro
----
-// Import individual components
-import NavMenu from '@sofidevo/astro-dynamic-header/NavMenu';
-import MobileNav from '@sofidevo/astro-dynamic-header/MobileNav';
-import HamburgerButton from '@sofidevo/astro-dynamic-header/HamburgerButton';
-
-// Or use the .astro extension explicitly
-import NavMenu from '@sofidevo/astro-dynamic-header/NavMenu.astro';
-import MobileNav from '@sofidevo/astro-dynamic-header/MobileNav.astro';
-import HamburgerButton from '@sofidevo/astro-dynamic-header/HamburgerButton.astro';
----
-
-<NavMenu menuItems={menuItems} showHomeLink={true} homeText="Home" />
-<MobileNav menuItems={menuItems} accentColor="#00ffff" />
-<HamburgerButton color="#ffffff" />
-```
 
 ## Styling and Customization
 
@@ -242,9 +221,43 @@ If you encounter import errors, try these solutions:
 
 Visit our demo website to see the component in action with interactive examples and complete documentation.
 
-## Contributing
+## Testing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+This project includes a comprehensive test suite with 34 tests covering all critical functionality.
+
+### Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run tests with coverage report
+npm run test:coverage
+```
+
+### Test Coverage
+
+The test suite covers:
+
+#### Component Logic Tests
+- **Header Component** (4 tests): Hamburger controller functionality, menu toggle behavior
+- **HamburgerButton Component** (10 tests): Button states, responsive behavior, accessibility
+- **MobileNav Component** (7 tests): Dropdown structure, nested submenus, conditional rendering
+- **NavMenu Component** (6 tests): Dynamic positioning, submenu interactions, viewport adjustments
+
+#### Integration Tests (7 tests)
+- Component interaction flows
+- Responsive behavior between mobile/desktop
+- Keyboard navigation and accessibility
+- Menu state management during navigation
+
+### Test Technologies
+- **Vitest**: Fast testing framework
+- **jsdom**: DOM simulation for component testing
+- **TypeScript**: Type-safe test writing
 
 ## License
 
