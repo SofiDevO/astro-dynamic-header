@@ -7,7 +7,8 @@ A dynamic, responsive header component for Astro projects that can switch betwee
 - 🎨 **Dynamic Styles**: Switch between floating and fullscreen header layouts
 - 📱 **Fully Responsive**: Mobile-first design with hamburger menu
 - 🎯 **Multi-level Dropdowns**: Support for nested navigation menus
-- 🚀 **TypeScript Support**: Full type safety and IntelliSense
+- � **Slot Support**: Customizable slots for desktop header and mobile panel content
+- �🚀 **TypeScript Support**: Full type safety and IntelliSense
 - 🎨 **Customizable**: Extensive customization options for colors, sizes, and behavior
 - ⚡ **Astro Optimized**: Built specifically for Astro framework
 
@@ -130,6 +131,131 @@ interface MenuItemType {
   text: string;
   submenu?: MenuItemType[];
 }
+```
+
+## Slots Support
+
+The Header component provides two customizable slots that allow you to add additional content:
+
+### Available Slots
+
+| Slot Name | Location | Visibility | Description |
+|-----------|----------|------------|-------------|
+| `slot-desktop` | Header (desktop & mobile) | Always visible | Add content to the main header area |
+| `slot-panel` | Mobile navigation panel | Mobile only | Add content to the mobile menu panel |
+
+### Slot Examples
+
+#### Using Individual Slots
+
+```astro
+---
+import Header from '@sofidevo/astro-dynamic-header/Header';
+
+const menuItems = [
+  { link: '/about', text: 'About' },
+  { link: '/contact', text: 'Contact' },
+];
+---
+
+<!-- Adding content only to desktop header -->
+<Header
+  headerType="floating"
+  logoSrc="/logo.png"
+  menuItems={menuItems}
+>
+  <button slot="slot-desktop" class="cta-button">Get Started</button>
+</Header>
+
+<!-- Adding content only to mobile panel -->
+<Header
+  headerType="fullscreen"
+  logoSrc="/logo.png"
+  menuItems={menuItems}
+>
+  <div slot="slot-panel" class="mobile-footer">
+    <p>© 2024 My Company</p>
+    <div class="social-links">
+      <a href="/twitter">Twitter</a>
+      <a href="/linkedin">LinkedIn</a>
+    </div>
+  </div>
+</Header>
+```
+
+#### Using Both Slots Together
+
+```astro
+---
+import Header from '@sofidevo/astro-dynamic-header/Header';
+
+const menuItems = [
+  { link: '/about', text: 'About' },
+  { link: '/services', text: 'Services' },
+  { link: '/contact', text: 'Contact' },
+];
+---
+
+<Header
+  headerType="fullscreen"
+  logoSrc="/logo.png"
+  logoAlt="My Company"
+  logoWidth="150px"
+  homeUrl="/"
+  menuItems={menuItems}
+  backgroundColor="#000000dd"
+  backdropBlur="blur(15px)"
+  zIndex={100}
+>
+  <!-- Content for desktop header -->
+  <button slot="slot-desktop" class="cta-button">
+    Sign Up
+  </button>
+  
+  <!-- Content for mobile panel -->
+  <div slot="slot-panel" class="mobile-extras">
+    <button class="mobile-cta">Download App</button>
+    <div class="mobile-contact">
+      <p>Call us: +1 (555) 123-4567</p>
+      <p>Email: info@company.com</p>
+    </div>
+  </div>
+</Header>
+```
+
+#### Responsive Slot Behavior
+
+The `slot-desktop` is visible on both desktop and mobile by default. If you want to hide it on mobile, use CSS:
+
+```css
+/* Hide desktop slot on mobile devices */
+@media (width < 768px) {
+  .cta-button {
+    display: none;
+  }
+}
+
+/* Or create responsive variants */
+.desktop-only {
+  display: block;
+}
+
+@media (width < 768px) {
+  .desktop-only {
+    display: none;
+  }
+}
+```
+
+```astro
+<Header menuItems={menuItems}>
+  <button slot="slot-desktop" class="cta-button desktop-only">
+    Desktop CTA
+  </button>
+  <div slot="slot-panel">
+    <button class="mobile-cta">Mobile CTA</button>
+  </div>
+</Header>
 ```
 
 ## Header Types
