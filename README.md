@@ -211,7 +211,7 @@ const menuItems = [
   <button slot="slot-desktop" class="cta-button">
     Sign Up
   </button>
-  
+
   <!-- Content for mobile panel -->
   <div slot="slot-panel" class="mobile-extras">
     <button class="mobile-cta">Download App</button>
