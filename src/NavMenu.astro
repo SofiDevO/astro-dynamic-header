@@ -190,7 +190,6 @@ const pagePathname = Astro.url.pathname;
   }
 
   .menu {
-    padding: 1rem;
     list-style: none;
     display: flex;
     align-items: center;
@@ -203,7 +202,7 @@ const pagePathname = Astro.url.pathname;
 
   .menu__link {
     text-decoration: none;
-    padding: 0.5rem 1rem;
+    padding: 0.5rem ;
     display: flex;
     align-items: center;
     gap: 0.8rem;
@@ -214,7 +213,7 @@ const pagePathname = Astro.url.pathname;
   @media screen and (min-width: 768px) {
     .menu__link::after {
       position: absolute;
-      top: 25px;
+      top: 33px;
       left: 0;
       content: "";
       width: 100%;
@@ -265,7 +264,7 @@ const pagePathname = Astro.url.pathname;
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    height: 4rem;
+    height: 1rem;
     border-radius: 0.4rem;
     color: #fff;
     color: var(--color-tertiary, #fff);
@@ -278,7 +277,7 @@ const pagePathname = Astro.url.pathname;
 
   .submenu__item--secondary a,
   .submenu__item--tertiary a {
-    padding: 2rem;
+    padding: 1rem;
   }
 
   .submenu__item--secondary a:hover,
@@ -288,7 +287,7 @@ const pagePathname = Astro.url.pathname;
   }
 
   .submenu {
-    padding: 1rem;
+    padding: .5rem;
     right: -23px;
   }
 
