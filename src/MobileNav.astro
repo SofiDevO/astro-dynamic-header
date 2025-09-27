@@ -50,7 +50,7 @@ const pagePathname = Astro.url.pathname;
       )
     }
     {
-      menuItems.map((item) => (
+      menuItems?.map((item: any) => (
         <li>
           {item.submenu ? (
             <details class="mobile-details">
@@ -65,7 +65,7 @@ const pagePathname = Astro.url.pathname;
                 />
               </summary>
               <ol class="mobile-submenu">
-                {item.submenu.map((sub) => (
+                {item?.submenu?.map((sub:any) => (
                   <li>
                     {sub.submenu && sub.submenu.length > 0 ? (
                       <details class="mobile-details">
@@ -80,7 +80,7 @@ const pagePathname = Astro.url.pathname;
                           />
                         </summary>
                         <ol class="mobile-subsubmenu">
-                          {sub.submenu.map((subsub) => (
+                          {sub.submenu.map((subsub:any) => (
                             <li class="mobile-submenu__item secondary">
                               <a
                                 class="menu__link mobile-menu__link"
