@@ -63,7 +63,7 @@ const pagePathname = Astro.url.pathname;
           const rect = subsubmenu.getBoundingClientRect();
 
           if (rect.right > viewportWidth) {
-            (subsubmenu as HTMLElement).style.left = "-200%";
+            (subsubmenu as HTMLElement).style.left = "-210%";
             (subsubmenu as HTMLElement).style.right = "auto";
             const leftRect = subsubmenu.getBoundingClientRect();
 
@@ -190,7 +190,6 @@ const pagePathname = Astro.url.pathname;
   }
 
   .menu {
-    padding: 1rem;
     list-style: none;
     display: flex;
     align-items: center;
@@ -203,7 +202,7 @@ const pagePathname = Astro.url.pathname;
 
   .menu__link {
     text-decoration: none;
-    padding: 0.5rem 1rem;
+    padding: 0.5rem ;
     display: flex;
     align-items: center;
     gap: 0.8rem;
@@ -214,7 +213,7 @@ const pagePathname = Astro.url.pathname;
   @media screen and (min-width: 768px) {
     .menu__link::after {
       position: absolute;
-      top: 25px;
+      top: 33px;
       left: 0;
       content: "";
       width: 100%;
@@ -288,7 +287,7 @@ const pagePathname = Astro.url.pathname;
   }
 
   .submenu {
-    padding: 1rem;
+    padding: 0.9rem;
     right: -23px;
   }
 
@@ -337,7 +336,7 @@ const pagePathname = Astro.url.pathname;
   .menu__item:hover > .submenu {
     opacity: 1;
     pointer-events: all;
-    transform: translateY(2.5rem);
+    transform: translateY(1.4rem);
   }
 
   .menu__item:hover > .submenu::after {

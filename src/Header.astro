@@ -88,10 +88,11 @@ const {
       <img class="header__logo" src={logoSrc} alt={logoAlt} style={`width: ${logoWidth};`} />
     </a>
     <NavMenu menuItems={menuItems} />
-    <slot/>
+    <slot name="slot-desktop" />
     <HamburgerButton />
-
-    <MobileNav menuItems={menuItems}  type={headerType} />
+    <MobileNav menuItems={menuItems}  type={headerType}>
+      <slot name="slot-panel" slot="slot-panel" />
+    </MobileNav>
 
   </header>
 </div>
@@ -114,7 +115,7 @@ const {
 
   /* Floating header container styles */
   .header__container--floating {
-    padding: 16px;
+    padding: 1rem;
   }
 
   /* Fullscreen header container styles */

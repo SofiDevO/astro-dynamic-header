@@ -110,6 +110,7 @@ const pagePathname = Astro.url.pathname;
       ))
     }
   </ol>
+  <slot name="slot-panel" />
 </nav>
 
 <style>
@@ -122,7 +123,7 @@ const pagePathname = Astro.url.pathname;
       width: 104vw;
       height: 100dvh;
       position: fixed;
-      top: -16px;
+      /* top: -16px; */
       left: 0;
       background: #151515;
       z-index: 20;
