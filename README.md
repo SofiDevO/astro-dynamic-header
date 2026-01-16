@@ -22,6 +22,16 @@ A dynamic, responsive header component for Astro projects that can switch betwee
  npm i @sofidevo/astro-dynamic-header
 ```
 
+## Required Dependencies
+
+You need to add the Iconify CDN to the head of your project for the hamburger menu icons to work properly:
+
+```html
+<script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js"></script>
+```
+
+Add this to your main layout or in the `<head>` section of your Astro pages.
+
 ## Quick Start
 
 ### Basic Usage

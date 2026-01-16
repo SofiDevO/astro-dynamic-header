@@ -1,0 +1,89 @@
+---
+import Header from  "../Header.astro";
+const menuItems = [
+    {
+      link: '#',
+      text: 'Services',
+      submenu: [
+          { link: '/design', text: 'Design' },
+          { link: '/consulting', text: 'Consulting' },
+          {
+            link: '#',
+            text: 'Web Development',
+            submenu: [
+              { link: '/web/frontend', text: 'Frontend' },
+              { link: '/web/backend', text: 'Backend' },
+              { link: '/web/fullstack', text: 'Full Stack' },
+            ],
+          },
+      ],
+    },
+    { link: '/about', text: 'About' },
+    { link: '/contact', text: 'Contact' },
+    {
+      link: '#',
+      text: 'Services',
+      submenu: [
+          { link: '/design', text: 'Design' },
+          { link: '/consulting', text: 'Consulting' },
+          {
+            link: '#',
+            text: 'Web Development',
+            submenu: [
+              { link: '/web/frontend', text: 'Frontend' },
+              { link: '/web/backend', text: 'Backend' },
+              { link: '/web/fullstack', text: 'Full Stack' },
+            ],
+          },
+      ],
+    },
+];
+---
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/iconify-icon@3.0.0/dist/iconify-icon.min.js"></script>
+    <title>My Astro Site with Dynamic Header</title>
+  </head>
+  <body>
+
+
+<Header
+    logoSrc="/img/logo-example.png"
+    logoAlt="My Site Logo"
+    logoWidth="44px"
+    homeUrl="/"
+    menuItems={menuItems}
+    headerType="fullscreen"
+/>
+
+  </body>
+</html>
+
+<style is:inline>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+    }
+    a{
+        color: inherit;
+        text-decoration: none;
+    }
+    ul{
+        margin: 0;
+        padding: 0;
+    }
+    ul li {
+        list-style: none;
+    }
+
+</style>

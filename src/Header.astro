@@ -30,7 +30,7 @@ const {
   headerType = "floating",
   logoSrc = "/logo.png",
   logoAlt = "Logo",
-  logoWidth = "120px",
+  logoWidth = "55px",
   homeUrl = "/",
   menuItems = [],
   backgroundColor = "#0d0d0dcc",
@@ -97,7 +97,7 @@ const {
   </header>
 </div>
 
-<style>
+<style is:inline>
   /* Base styles for header container */
   .header__container {
     width: 100%;
@@ -115,7 +115,7 @@ const {
 
   /* Floating header container styles */
   .header__container--floating {
-    padding: 1rem;
+    padding: .5rem;
   }
 
   /* Fullscreen header container styles */
@@ -129,6 +129,7 @@ const {
     align-items: center;
     width: 100%;
     justify-content: space-between;
+    padding: 1rem 2rem;
 
     @media (width < 768px) {
       align-self: flex-end;
@@ -140,8 +141,8 @@ const {
   /* Floating header styles */
   .header--floating {
     max-width: 1100px;
-    border-radius: 18px;
-    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    padding: .7rem 1rem;
 
     @media (width < 768px) {
       max-width: 95%;
