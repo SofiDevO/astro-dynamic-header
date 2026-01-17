@@ -59,7 +59,9 @@ const menuItems = [
     homeUrl="/"
     menuItems={menuItems}
     headerType="fullscreen"
-/>
+>
+    <button slot="actions">same btn</button>
+  </Header>
 
   </body>
 </html>
@@ -85,5 +87,19 @@ const menuItems = [
     ul li {
         list-style: none;
     }
-
+    .desktop {
+        display: block;
+    }
+    .mobile {
+        display: none;
+    }
+    @media screen and (max-width: 767px) {
+        .desktop {
+            display: none;
+        }
+        .mobile {
+            display: block;
+            color: white;
+        }
+    }
 </style>

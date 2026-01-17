@@ -95,13 +95,17 @@ const {
   <header class={`header header--${headerType}`} style={`background-color: ${backgroundColor}; backdrop-filter: ${backdropBlur}; -webkit-backdrop-filter: ${backdropBlur};`}>
     <a class="logo__container" href={homeUrl}>
       <img class="header__logo" src={logoSrc} alt={logoAlt} style={`width: ${logoWidth};`} />
-      {logoText && <span class="header__logo-text" style={`color: ${logoTextColor};`}>{logoText}</span>}
+      {logoText && <span class="header__logo-text" style={`color: ${logoTextColor}; font-size: ${logoTextSize};`}>{logoText}</span>}
     </a>
     <NavMenu menuItems={menuItems} />
-    <slot name="slot-desktop" />
+    <div class="actions-desktop">
+      <slot name="actions" />
+    </div>
     <HamburgerButton />
     <MobileNav menuItems={menuItems}  type={headerType}>
-      <slot name="slot-panel" slot="slot-panel" />
+      <div class="actions-mobile" slot="slot-panel">
+        <slot name="actions" />
+      </div>
     </MobileNav>
 
   </header>
@@ -181,6 +185,20 @@ const {
   .header__logo {
     margin-right: 1em;
     object-fit: contain;
+  }
+
+  /* Actions visibility control */
+  .actions-desktop {
+    @media (width < 768px) {
+      display: none;
+    }
+  }
+
+  .actions-mobile {
+    margin-top: 20px;
+    @media (width >= 768px) {
+      display: none;
+    }
   }
 
   /* Adjust transform for fullscreen header */

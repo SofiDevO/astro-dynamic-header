@@ -4,13 +4,13 @@ A dynamic, responsive header component for Astro projects that can switch betwee
 
 ## Features
 
-- 🎨 **Dynamic Styles**: Switch between floating and fullscreen header layouts
-- 📱 **Fully Responsive**: Mobile-first design with hamburger menu
-- 🎯 **Multi-level Dropdowns**: Support for nested navigation menus
-- � **Slot Support**: Customizable slots for desktop header and mobile panel content
-- �🚀 **TypeScript Support**: Full type safety and IntelliSense
-- 🎨 **Customizable**: Extensive customization options for colors, sizes, and behavior
-- ⚡ **Astro Optimized**: Built specifically for Astro framework
+- **Dynamic Styles**: Switch between floating and fullscreen header layouts
+- **Fully Responsive**: Mobile-first design with hamburger menu
+- **Multi-level Dropdowns**: Support for nested navigation menus
+- **Slot Support**: Customizable slots for desktop header and mobile panel content
+- **TypeScript Support**: Full type safety and IntelliSense
+- **Customizable**: Extensive customization options for colors, sizes, and behavior
+- **Astro Optimized**: Built specifically for Astro framework
 
 
 ### Live demo
@@ -126,7 +126,10 @@ const menuItems = [
 | `headerType` | `"floating" \| "fullscreen"` | `"floating"` | Header layout style |
 | `logoSrc` | `string` | `"/logo.png"` | Logo image source |
 | `logoAlt` | `string` | `"Logo"` | Logo alt text |
-| `logoWidth` | `string` | `"120px"` | Logo width |
+| `logoWidth` | `string` | `"55px"` | Logo width |
+| `logoText` | `string` | `"Your logo text"` | Text displayed next to the logo |
+| `logoTextSize` | `string` | `"1em"` | Font size for logo text |
+| `logoTextColor` | `string` | `"#ffffff"` | Color for logo text |
 | `homeUrl` | `string` | `"/"` | Home page URL |
 | `menuItems` | `MenuItemType[]` | `[]` | Navigation menu items |
 | `backgroundColor` | `string` | `"#0d0d0dcc"` | Header background color |
@@ -145,18 +148,24 @@ interface MenuItemType {
 
 ## Slots Support
 
-The Header component provides two customizable slots that allow you to add additional content:
+The Header component provides a flexible slot system that allows you to add additional content:
 
 ### Available Slots
 
 | Slot Name | Location | Visibility | Description |
-|-----------|----------|------------|-------------|
-| `slot-desktop` | Header (desktop & mobile) | Always visible | Add content to the main header area |
-| `slot-panel` | Mobile navigation panel | Mobile only | Add content to the mobile menu panel |
+|-----------|----------|------------|-----------|
+| `actions` | Header & Mobile panel | Responsive visibility | Add action buttons (login, signup, etc.) that appear in both desktop and mobile |
+
+### Actions Slot Behavior
+
+The `actions` slot is intelligent and automatically manages visibility:
+- **Desktop (≥768px)**: Shows actions in the main header after navigation
+- **Mobile (<768px)**: Shows same actions inside the mobile menu panel
+- **Automatic hiding**: Desktop version is hidden on mobile, mobile version is hidden on desktop
 
 ### Slot Examples
 
-#### Using Individual Slots
+#### Using the Actions Slot
 
 ```astro
 ---
@@ -168,32 +177,20 @@ const menuItems = [
 ];
 ---
 
-<!-- Adding content only to desktop header -->
 <Header
   headerType="floating"
   logoSrc="/logo.png"
+  logoText="My Company"
   menuItems={menuItems}
 >
-  <button slot="slot-desktop" class="cta-button">Get Started</button>
-</Header>
-
-<!-- Adding content only to mobile panel -->
-<Header
-  headerType="fullscreen"
-  logoSrc="/logo.png"
-  menuItems={menuItems}
->
-  <div slot="slot-panel" class="mobile-footer">
-    <p>© 2024 My Company</p>
-    <div class="social-links">
-      <a href="/twitter">Twitter</a>
-      <a href="/linkedin">LinkedIn</a>
-    </div>
+  <div slot="actions">
+    <button class="login-btn">Login</button>
+    <button class="signup-btn">Sign Up</button>
   </div>
 </Header>
 ```
 
-#### Using Both Slots Together
+#### Complete Example with All Props
 
 ```astro
 ---
@@ -210,64 +207,64 @@ const menuItems = [
   headerType="fullscreen"
   logoSrc="/logo.png"
   logoAlt="My Company"
-  logoWidth="150px"
+  logoWidth="60px"
+  logoText="My Company"
+  logoTextSize="1.2em"
+  logoTextColor="#ffffff"
   homeUrl="/"
   menuItems={menuItems}
   backgroundColor="#000000dd"
   backdropBlur="blur(15px)"
   zIndex={100}
 >
-  <!-- Content for desktop header -->
-  <button slot="slot-desktop" class="cta-button">
-    Sign Up
-  </button>
-
-  <!-- Content for mobile panel -->
-  <div slot="slot-panel" class="mobile-extras">
-    <button class="mobile-cta">Download App</button>
-    <div class="mobile-contact">
-      <p>Call us: +1 (555) 123-4567</p>
-      <p>Email: info@company.com</p>
-    </div>
+  <div slot="actions" class="header-actions">
+    <button class="btn btn-outline">Login</button>
+    <button class="btn btn-primary">Get Started</button>
   </div>
 </Header>
 ```
 
-#### Responsive Slot Behavior
-
-The `slot-desktop` is visible on both desktop and mobile by default. If you want to hide it on mobile, use CSS:
+#### Styling Action Buttons
 
 ```css
-/* Hide desktop slot on mobile devices */
-@media (width < 768px) {
-  .cta-button {
-    display: none;
-  }
+.header-actions {
+  display: flex;
+  gap: 0.5em;
+  align-items: center;
 }
 
-/* Or create responsive variants */
-.desktop-only {
-  display: block;
+.btn {
+  padding: 0.5em 1em;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.2s ease;
 }
 
-@media (width < 768px) {
-  .desktop-only {
-    display: none;
-  }
+.btn-outline {
+  background: transparent;
+  color: #ffffff;
+  border: 1px solid #ffffff;
+}
+
+.btn-outline:hover {
+  background: #ffffff;
+  color: #000000;
+}
+
+.btn-primary {
+  background: #00ffff;
+  color: #000000;
+}
+
+.btn-primary:hover {
+  background: #00cccc;
 }
 ```
-
-```astro
-<Header menuItems={menuItems}>
-  <button slot="slot-desktop" class="cta-button desktop-only">
-    Desktop CTA
-  </button>
-  <div slot="slot-panel">
-    <button class="mobile-cta">Mobile CTA</button>
-  </div>
-</Header>
-```
-
 ## Header Types
 
 ### Floating Header
@@ -348,10 +345,10 @@ If you encounter import errors, try these solutions:
 
 ### Compatibility
 
-- ✅ Astro 4.x and 5.x
-- ✅ SSG Projects (Static Site Generation)
-- ✅ SSR Projects (Server-Side Rendering)
-- ✅ Hybrid Projects (output: 'hybrid')
+- Astro 4.x and 5.x
+- SSG Projects (Static Site Generation)
+- SSR Projects (Server-Side Rendering)
+- Hybrid Projects (output: 'hybrid')
 
 ## Live Examples
 
@@ -401,4 +398,4 @@ MIT License - see the [LICENSE](./LICENSE) file for details.
 
 ## Support
 
-If you find this package helpful, please consider giving it a ⭐ on GitHub!
+If you find this package helpful, please consider giving it a star on GitHub!
