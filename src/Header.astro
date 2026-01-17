@@ -98,14 +98,18 @@ const {
       {logoText && <span class="header__logo-text" style={`color: ${logoTextColor}; font-size: ${logoTextSize};`}>{logoText}</span>}
     </a>
     <NavMenu menuItems={menuItems} />
-    <div class="actions-desktop">
-      <slot name="actions" />
-    </div>
-    <HamburgerButton />
-    <MobileNav menuItems={menuItems}  type={headerType}>
-      <div class="actions-mobile" slot="slot-panel">
+    {Astro.slots.has('actions') && (
+      <div class="actions-desktop">
         <slot name="actions" />
       </div>
+    )}
+    <HamburgerButton />
+    <MobileNav menuItems={menuItems}  type={headerType}>
+      {Astro.slots.has('actions') && (
+        <div class="actions-mobile" slot="slot-panel">
+          <slot name="actions" />
+        </div>
+      )}
     </MobileNav>
 
   </header>
