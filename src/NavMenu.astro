@@ -86,7 +86,7 @@ const pagePathname = Astro.url.pathname;
 
           const isPositionedLeft =
             (subsubmenu as HTMLElement).style.left === "-100%";
-          const transformDirection = isPositionedLeft ? "-2rem" : "2rem";
+          const transformDirection = isPositionedLeft ? "-32px" : "32px";
 
           const currentTransform = (subsubmenu as HTMLElement).style.transform;
           if (currentTransform && currentTransform.includes("translateX")) {
@@ -202,10 +202,10 @@ const pagePathname = Astro.url.pathname;
 
   .menu__link {
     text-decoration: none;
-    padding: 0.5rem ;
+    padding: 0.5em ;
     display: flex;
     align-items: center;
-    gap: 0.8rem;
+    gap: 0.8em;
     color: color-mix(in srgb, var(--light-spot-color, #00ffff) 30%, white 70%);
     position: relative;
   }
@@ -244,9 +244,9 @@ const pagePathname = Astro.url.pathname;
     border: 0.5px solid #3e1c71;
     position: absolute;
     flex-direction: column;
-    gap: 0.4rem;
-    padding: 2rem 1rem;
-    border-radius: 0.6rem;
+    gap: 0.4em;
+    padding:  1em;
+    border-radius: 10px;
     transition: transform 0.3s ease-in-out;
     pointer-events: none;
     opacity: 0;
@@ -266,7 +266,7 @@ const pagePathname = Astro.url.pathname;
     align-items: center;
     width: 100%;
     height: 64px;
-    border-radius: 0.4rem;
+    border-radius: 6px;
     color: #fff;
     color: var(--color-tertiary, #fff);
   }
@@ -278,7 +278,7 @@ const pagePathname = Astro.url.pathname;
 
   .submenu__item--secondary a,
   .submenu__item--tertiary a {
-    padding: 32px;
+    padding: 26px;
   }
 
   .submenu__item--secondary a:hover,
@@ -288,18 +288,18 @@ const pagePathname = Astro.url.pathname;
   }
 
   .submenu {
-    padding: 0.9rem;
-    right: -23px;
+    padding: 0.9em;
+    right: calc(50% - 80px);
   }
 
   .submenu::after {
     content: "";
     position: absolute;
-    top: -4rem;
+    top: -4em;
     width: 100%;
     z-index: -3;
     pointer-events: none;
-    height: 10rem;
+    height: 10em;
   }
 
   .subsubmenu {
@@ -312,22 +312,22 @@ const pagePathname = Astro.url.pathname;
   .subsubmenu::before {
     content: "";
     position: absolute;
-    top: -4rem;
+    top: -4em;
     z-index: -1;
     pointer-events: none;
-    height: 10rem;
-    width: 20rem;
-    height: 14rem;
+    height: 10em;
+    width: 20em;
+    height: 14em;
   }
 
   .subsubmenu::after {
     content: "";
     position: absolute;
     top: -14px;
-    right: 3rem;
+    right: 3em;
     width: 100%;
     z-index: -3;
-    height: 21rem;
+    height: 21em;
   }
 
   .submenu li {
@@ -337,7 +337,7 @@ const pagePathname = Astro.url.pathname;
   .menu__item:hover > .submenu {
     opacity: 1;
     pointer-events: all;
-    transform: translateY(1.4rem);
+    transform: translateY(1.4em);
   }
 
   .menu__item:hover > .submenu::after {

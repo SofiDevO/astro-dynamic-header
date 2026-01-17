@@ -5,9 +5,14 @@ import MobileNav from "./MobileNav.astro";
 
 export interface Props {
   headerType?: "floating" | "fullscreen";
+  // properties for logo
   logoSrc?: string;
   logoAlt?: string;
   logoWidth?: string;
+  logoText?: string;
+  logoTextSize?: string;
+  logoTextColor?: string;
+  // properties for navigation
   homeUrl?: string;
   menuItems?: Array<{
     link: string;
@@ -21,6 +26,7 @@ export interface Props {
       }>;
     }>;
   }>;
+  // styles
   backgroundColor?: string;
   backdropBlur?: string;
   zIndex?: number;
@@ -31,6 +37,9 @@ const {
   logoSrc = "/logo.png",
   logoAlt = "Logo",
   logoWidth = "55px",
+  logoText = "Your logo text",
+  logoTextSize = "1em",
+  logoTextColor = "#ffffff",
   homeUrl = "/",
   menuItems = [],
   backgroundColor = "#0d0d0dcc",
@@ -84,8 +93,9 @@ const {
 
 <div class={`header__container header__container--${headerType}`} style={`z-index: ${zIndex};`}>
   <header class={`header header--${headerType}`} style={`background-color: ${backgroundColor}; backdrop-filter: ${backdropBlur}; -webkit-backdrop-filter: ${backdropBlur};`}>
-    <a href={homeUrl}>
+    <a class="logo__container" href={homeUrl}>
       <img class="header__logo" src={logoSrc} alt={logoAlt} style={`width: ${logoWidth};`} />
+      {logoText && <span class="header__logo-text" style={`color: ${logoTextColor};`}>{logoText}</span>}
     </a>
     <NavMenu menuItems={menuItems} />
     <slot name="slot-desktop" />
@@ -97,7 +107,7 @@ const {
   </header>
 </div>
 
-<style is:inline>
+<style is:inline >
   /* Base styles for header container */
   .header__container {
     width: 100%;
@@ -115,7 +125,7 @@ const {
 
   /* Floating header container styles */
   .header__container--floating {
-    padding: .5rem;
+    padding: .5em;
   }
 
   /* Fullscreen header container styles */
@@ -129,11 +139,11 @@ const {
     align-items: center;
     width: 100%;
     justify-content: space-between;
-    padding: 1rem 2rem;
+    padding: 1em 2em;
 
     @media (width < 768px) {
       align-self: flex-end;
-      padding: 0.4rem;
+      padding: 0.4em;
       margin: 0 auto;
     }
   }
@@ -142,7 +152,7 @@ const {
   .header--floating {
     max-width: 1100px;
     border-radius: 20px;
-    padding: .7rem 1rem;
+    padding: .7em 1em;
 
     @media (width < 768px) {
       max-width: 95%;
@@ -152,16 +162,24 @@ const {
   /* Fullscreen header styles */
   .header--fullscreen {
     border-radius: 0;
-    padding: 1rem 2rem;
+    padding: 1em 2em;
 
     @media (width < 768px) {
       max-width: 100%;
-      padding: 0.8rem 1rem;
+      padding: 0.8em 1em;
     }
   }
 
+  .logo__container {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    & span{
+      font-weight: 600;
+    }
+  }
   .header__logo {
-    margin-right: 1rem;
+    margin-right: 1em;
     object-fit: contain;
   }
 
