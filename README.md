@@ -2,6 +2,9 @@
 
 A dynamic, responsive header component for Astro projects that can switch between floating and fullscreen styles with multi-level dropdown navigation support.
 
+> [!WARNING]
+> **Breaking Changes**: Version 2.0+ introduces a restructured configuration object. If you are upgrading from an older version, please review the [Component Props](#component-props) and the [Comprehensive Example](#comprehensive-example) to migrate your configuration.
+
 ## Features
 
 - **Dynamic Styles**: Switch between floating and fullscreen header layouts
@@ -42,15 +45,15 @@ By default, the header uses `preset="auto"`, which automatically detects the the
 ---
 import Header from '@sofidevo/astro-dynamic-header/Header';
 
-const navigation = {
-  menuItems: [
+
+const =  menuItems: [
     { link: '/about', text: 'About' },
   ]
-};
+
 ---
 
 <!-- Detects .dark class on root automatically -->
-<Header navigation={navigation} />
+<Header navigation={{ menuItems }} />
 ```
 
 ### Advanced Usage (Dual-Theme Customization)
@@ -58,9 +61,14 @@ const navigation = {
 You can provide custom colors for both light and dark modes simultaneously.
 
 ```astro
+
 ---
 import Header from '@sofidevo/astro-dynamic-header/Header';
-
+const navigation = {
+  menuItems: [
+    { link: '/about', text: 'About' },
+  ]
+};
 const theme = {
   light: {
     accentColor: "#3e1c71",
@@ -104,14 +112,14 @@ const theme = {
 
 #### ThemeConfig
 
-| Propery                | Type     | Default          |
-| ---------------------- | -------- | ---------------- |
-| `backgroundColor`      | `string` | _Preset default_ |
-| `backgroundColorOpaque`| `string` | _Preset default_ |
-| `backdropBlur`         | `string` | `"blur(20px)"`   |
-| `zIndex`               | `number` | `10`             |
-| `textColor`            | `string` | _Preset default_ |
-| `accentColor`          | `string` | _Preset default_ |
+| Propery                 | Type     | Default          |
+| ----------------------- | -------- | ---------------- |
+| `backgroundColor`       | `string` | _Preset default_ |
+| `backgroundColorOpaque` | `string` | _Preset default_ |
+| `backdropBlur`          | `string` | `"blur(20px)"`   |
+| `zIndex`                | `number` | `10`             |
+| `textColor`             | `string` | _Preset default_ |
+| `accentColor`           | `string` | _Preset default_ |
 
 > [!IMPORTANT]
 > **Transparency vs Solid Submenus**: To ensure the best UI and avoid rendering bugs with `backdrop-filter` on nested elements, submenus and the mobile navigation panel are **solid/opaque**.
@@ -136,6 +144,32 @@ const theme = {
 | `logo`      | `string` | Logo link container class        |
 | `logoText`  | `string` | Logo text class                  |
 | `nav`       | `string` | Desktop navigation wrapper class |
+
+#### LogoConfig
+
+| Property    | Type     | Description                                      |
+| ----------- | -------- | ------------------------------------------------ |
+| `src`       | `string` | URL of the logo image                            |
+| `alt`       | `string` | Alternative text for the logo image              |
+| `width`     | `string` | Width of the logo (e.g., "50px", "5rem")         |
+| `text`      | `string` | Text to display next to or instead of logo image |
+| `textSize`  | `string` | Font size for the logo text                      |
+| `textColor` | `string` | Color for the logo text                          |
+
+#### NavConfig
+
+| Property    | Type         | Description                             |
+| ----------- | ------------ | --------------------------------------- |
+| `homeUrl`   | `string`     | URL for the home link (defaults to `/`) |
+| `menuItems` | `MenuItem[]` | Array of navigation menu items          |
+
+#### MenuItem
+
+| Property  | Type                  | Description                         |
+| --------- | --------------------- | ----------------------------------- |
+| `link`    | `string`              | URL the menu item points to         |
+| `text`    | `string`              | Label text for the menu item        |
+| `submenu` | `SecondaryMenuItem[]` | Optional array of nested menu items |
 
 ## Slots Support
 
@@ -165,46 +199,64 @@ const navigation = {
 </Header>
 ```
 
-#### Styling Action Buttons
+## Comprehensive Example
 
-```css
-.header-actions {
-  display: flex;
-  gap: 0.5em;
-  align-items: center;
-}
+Below is a complete implementation example showcasing custom logo configuration, navigation with a home URL, and theme overrides.
 
-.btn {
-  padding: 0.5em 1em;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 500;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  transition: all 0.2s ease;
-}
+```astro
+---
+import Header from '@sofidevo/astro-dynamic-header/Header';
 
-.btn-outline {
-  background: transparent;
-  color: #ffffff;
-  border: 1px solid #ffffff;
-}
+const menuItems = [
+  {
+    link: "#",
+    text: "Services",
+    submenu: [
+      { link: "/design", text: "Design" },
+      { link: "/consulting", text: "Consulting" },
+      {
+        link: "#",
+        text: "Web Development",
+        submenu: [
+          { link: "/web/frontend", text: "Frontend" },
+          { link: "/web/backend", text: "Backend" },
+          { link: "/web/fullstack", text: "Full Stack" },
+        ],
+      },
+    ],
+  },
+  { link: "/about", text: "About" },
+  { link: "/contact", text: "Contact" },
+];
 
-.btn-outline:hover {
-  background: #ffffff;
-  color: #000000;
-}
+const theme = {
+  light: {
+    accentColor: "#ff0000",
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
+  },
+  dark: {
+    accentColor: "#00ffff",
+    backgroundColor: "rgba(20, 20, 20, 0.9)",
+  },
+};
+---
 
-.btn-primary {
-  background: #00ffff;
-  color: #000000;
-}
-
-.btn-primary:hover {
-  background: #00cccc;
-}
+<Header
+  headerType="floating"
+  preset="dark"
+  logo={{
+    src: "https://itssofi.dev/img/icons/sofi-icon.webp",
+    alt: "My Site Logo",
+    width: "44px",
+  }}
+  navigation={{
+    homeUrl: "/",
+    menuItems: menuItems,
+  }}
+  theme={theme}
+>
+  <button slot="actions">Login</button>
+</Header>
 ```
 
 ## Header Types
@@ -242,17 +294,17 @@ The package provides full TypeScript support. You can import types to ensure you
 ```astro
 ---
 import Header from '@sofidevo/astro-dynamic-header/Header';
-import type { 
-  NavConfig, 
-  DualThemeConfig, 
+import type {
+  NavConfig,
+  DualThemeConfig,
   MenuItem,
   SecondaryMenuItem
 } from '@sofidevo/astro-dynamic-header';
 
 const navigation: NavConfig = {
   menuItems: [
-    { 
-      link: '/products', 
+    {
+      link: '/products',
       text: 'Products',
       submenu: [
         { link: '/software', text: 'Software' },
@@ -276,25 +328,25 @@ const theme: DualThemeConfig = {
 };
 ---
 
-<Header 
-  navigation={navigation} 
-  theme={theme} 
-  preset="auto" 
+<Header
+  navigation={navigation}
+  theme={theme}
+  preset="auto"
 />
 ```
 
 ### Available Types
 
-| Type | Description |
-|------|-------------|
-| `MenuItem` | Top-level menu item with optional properties |
-| `SecondaryMenuItem` | Second-level menu item |
-| `TertiaryMenuItem` | Third-level menu item |
-| `NavConfig` | Main navigation configuration object |
-| `ThemeConfig` | Individual theme settings (colors, blur, etc.) |
-| `DualThemeConfig` | Combined settings for light and dark modes |
-| `LogoConfig` | Logo image and text configuration |
-| `HeaderProps` | Main props for the Header component |
+| Type                | Description                                    |
+| ------------------- | ---------------------------------------------- |
+| `MenuItem`          | Top-level menu item with optional properties   |
+| `SecondaryMenuItem` | Second-level menu item                         |
+| `TertiaryMenuItem`  | Third-level menu item                          |
+| `NavConfig`         | Main navigation configuration object           |
+| `ThemeConfig`       | Individual theme settings (colors, blur, etc.) |
+| `DualThemeConfig`   | Combined settings for light and dark modes     |
+| `LogoConfig`        | Logo image and text configuration              |
+| `HeaderProps`       | Main props for the Header component            |
 
 ## Browser Support
 
@@ -324,7 +376,7 @@ If you encounter import errors, try these solutions:
    // tsconfig.json
    {
      "compilerOptions": {
-       "moduleResolution": "bundler", 
+       "moduleResolution": "bundler",
        "allowImportingTsExtensions": true
      }
    }
@@ -340,47 +392,6 @@ If you encounter import errors, try these solutions:
 ## Live Examples
 
 Visit our demo website to see the component in action with interactive examples and complete documentation.
-
-## Testing
-
-This project includes a comprehensive test suite with 34 tests covering all critical functionality.
-
-### Running Tests
-
-```bash
-# Run all tests
-npm test
-
-# Run tests in watch mode
-npm run test:watch
-
-# Run tests with coverage report
-npm run test:coverage
-```
-
-### Test Coverage
-
-The test suite covers:
-
-#### Component Logic Tests
-
-- **Header Component** (4 tests): Hamburger controller functionality, menu toggle behavior
-- **HamburgerButton Component** (10 tests): Button states, responsive behavior, accessibility
-- **MobileNav Component** (7 tests): Dropdown structure, nested submenus, conditional rendering
-- **NavMenu Component** (6 tests): Dynamic positioning, submenu interactions, viewport adjustments
-
-#### Integration Tests (7 tests)
-
-- Component interaction flows
-- Responsive behavior between mobile/desktop
-- Keyboard navigation and accessibility
-- Menu state management during navigation
-
-### Test Technologies
-
-- **Vitest**: Fast testing framework
-- **jsdom**: DOM simulation for component testing
-- **TypeScript**: Type-safe test writing
 
 ## License
 

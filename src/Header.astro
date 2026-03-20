@@ -28,6 +28,20 @@ const {
   classNames = {},
 } = Astro.props;
 
+if (import.meta.env.DEV) {
+  // Check if logo is being passed as a string (legacy)
+  if (typeof logo === "string") {
+    console.warn(
+      "[@sofidevo/astro-dynamic-header] BREAKING CHANGE: The 'logo' prop now expects an object. Please use logo={{ src: '...' }} instead.",
+    );
+  }
+  if (Array.isArray(navigation)) {
+    console.warn(
+      "[@sofidevo/astro-dynamic-header] BREAKING CHANGE: The 'navigation' prop now expects an object with 'menuItems'. Please use navigation={{ menuItems: [...] }} instead.",
+    );
+  }
+}
+
 // Default theme configuration
 const defaultThemes = {
   light: {
@@ -119,7 +133,12 @@ const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
   style={{ zIndex: lightTheme.zIndex }}
 >
   <header
-    class:list={["header", `header--${headerType}`, forcedClass, classNames.header]}
+    class:list={[
+      "header",
+      `header--${headerType}`,
+      forcedClass,
+      classNames.header,
+    ]}
     style={{
       "--l-bg": lightTheme.backgroundColor,
       "--l-bg-opaque": lightTheme.backgroundColorOpaque,
@@ -151,7 +170,7 @@ const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
         )
       }
     </a>
-    
+
     <div class:list={["nav-menu-wrapper", classNames.nav]}>
       <NavMenu menuItems={menuItems} />
     </div>
@@ -163,13 +182,10 @@ const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
         </div>
       )
     }
-    
+
     <HamburgerButton />
-    
-    <MobileNav 
-      menuItems={menuItems} 
-      type={headerType} 
-    >
+
+    <MobileNav menuItems={menuItems} type={headerType}>
       {
         Astro.slots.has("actions") && (
           <div class="actions-mobile" slot="slot-panel">
@@ -198,7 +214,9 @@ const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
     backdrop-filter: var(--backdrop-blur);
     -webkit-backdrop-filter: var(--backdrop-blur);
     color: var(--text-color);
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition:
+      background-color 0.3s ease,
+      color 0.3s ease;
 
     @media (width < 768px) {
       align-self: flex-end;
@@ -284,7 +302,7 @@ const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
       font-weight: 600;
     }
   }
-  
+
   .header__logo {
     margin-right: 1em;
     object-fit: contain;
