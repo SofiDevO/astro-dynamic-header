@@ -63,7 +63,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/SofiDevO/astro-dynamic-header"
+    "url": "git+https://github.com/SofiDevO/astro-dynamic-header.git"
   },
   "bugs": {
     "url": "https://github.com/SofiDevO/astro-dynamic-header/issues"

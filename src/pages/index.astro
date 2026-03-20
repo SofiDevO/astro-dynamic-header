@@ -38,6 +38,16 @@ const menuItems = [
     ],
   },
 ];
+const theme = {
+  light: {
+    accentColor: "#ff0000",
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
+  },
+  dark: {
+    accentColor: "#00ffff",
+    backgroundColor: "rgba(20, 20, 20, 0.9)",
+  },
+};
 ---
 
 <!doctype html>
@@ -63,15 +73,7 @@ const menuItems = [
         homeUrl: "/",
         menuItems: menuItems,
       }}
-      theme={{
-        light: {
-          accentColor: "#3e1c71",
-        },
-        dark: {
-          accentColor: "#00ffff",
-          backgroundColor: "rgba(20, 20, 20, 0.8)",
-        },
-      }}
+      theme={theme}
     >
       <button slot="actions">same btn</button>
     </Header>
