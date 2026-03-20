@@ -11,11 +11,31 @@ import type {
 } from "./index.js";
 
 export interface Props {
+  /** 
+   * Layout style.
+   * - "floating": Centered with max-width and rounded corners.
+   * - "fullscreen": Full width with no border radius.
+   * @default "floating"
+   */
   headerType?: "floating" | "fullscreen";
+  /** 
+   * Theme behavior.
+   * - "light": Force light mode.
+   * - "dark": Force dark mode.
+   * - "auto": Detects .dark class on the root element.
+   * @default "auto"
+   */
   preset?: "light" | "dark" | "auto";
+  /** Logo configuration object (src, alt, text, etc.) */
   logo?: LogoConfig;
+  /** Navigation links and structure. */
   navigation?: NavConfig;
+  /** Custom theme overrides for light and dark modes. */
   theme?: DualThemeConfig;
+  /** 
+   * Custom CSS classes for specific internal elements.
+   * @example { header: "shadow-lg", nav: "ml-auto" }
+   */
   classNames?: CustomClassNames;
 }
 

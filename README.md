@@ -137,13 +137,44 @@ const theme = {
 
 #### CustomClassNames
 
-| Propery     | Type     | Description                      |
-| ----------- | -------- | -------------------------------- |
-| `container` | `string` | Main container class             |
-| `header`    | `string` | Header element class             |
-| `logo`      | `string` | Logo link container class        |
-| `logoText`  | `string` | Logo text class                  |
-| `nav`       | `string` | Desktop navigation wrapper class |
+The `classNames` prop allows you to inject custom CSS classes (such as Tailwind CSS utility classes) into specific high-level elements of the Header component. This provides a bridge between the component's internal styles and your project's global styling system.
+
+| Property    | Target Element                                  | Purpose & Common Use Cases                                                                                               |
+| ----------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `container` | Outer `div` wrapping the header                 | **Positioning & Layout**: Use for `top-0`, `z-50`, `fixed`, or adjusting the `max-width` and `mx-auto` logic.           |
+| `header`    | Inner `<header>` element                        | **Appearance**: The best place for shadows (`shadow-md`), borders (`border-b`), or custom transition durations.          |
+| `logo`      | `<a>` tag surrounding the logo                  | **Interactions**: Add hover states, custom focus rings, or adjust the flex alignment of the logo group.                  |
+| `logoText`  | `<span>` tag containing the logo text           | **Typography**: Override font weights, apply text shadows, or use specific tracking/leading classes.                       |
+| `nav`       | `div` wrapping the desktop navigation items      | **Desktop Layout**: Adjust spacing between the logo and the menu, or add responsive visibility classes (`hidden md:flex`). |
+
+##### Advanced Usage Examples
+
+**Implementing a Premium Shadow & Border (Tailwind):**
+Ideal for creating a modern "glass" effect with a subtle border and shadow that adapts to dark mode.
+
+```astro
+<Header 
+  classNames={{ 
+    header: "shadow-xl border-b border-black/5 dark:border-white/10 transition-all duration-500",
+    container: "top-4 px-6"
+  }} 
+/>
+```
+
+**Custom Typography for Logo & Nav Spacing:**
+Perfect for matching the header with your brand's specific typography and layout requirements.
+
+```astro
+<Header 
+  classNames={{ 
+    logoText: "tracking-tighter font-black italic uppercase",
+    nav: "ml-auto gap-8" /* Moves menu to the right and increases gap */
+  }} 
+/>
+```
+
+> [!TIP]
+> Since these classes are injected using Astro's `class:list`, you can also pass objects or arrays if you need conditional logic for your custom classes.
 
 #### LogoConfig
 

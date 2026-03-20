@@ -2,9 +2,13 @@
 import type { MenuItem, SecondaryMenuItem, TertiaryMenuItem } from "./index.js";
 
 export interface Props {
+  /** Header type for styling: "floating" or "fullscreen" */
   type?: "floating" | "fullscreen";
+  /** Array of menu items to display in the mobile menu */
   menuItems?: MenuItem[];
+  /** Whether to show the home link (defaults to true) */
   showHomeLink?: boolean;
+  /** Text for the home link (defaults to "Home") */
   homeText?: string;
 }
 
@@ -38,64 +42,73 @@ const pagePathname = Astro.url.pathname;
       )
     }
     {
-      menuItems?.map((item: MenuItem) => (
-        <li>
-          {item.submenu ? (
-            <details class="mobile-details">
-              <summary class="menu__summary">
+      menuItems?.map((item: MenuItem) => {
+        const isActive = pagePathname === item.link;
+        return (
+          <li>
+            {item.submenu ? (
+              <details class="mobile-details" open={item.submenu.some(sub => pagePathname === sub.link)}>
+                <summary class:list={["menu__summary", { active: isActive }]}>
+                  {item.text}
+                  <iconify-icon
+                    class="iconify-arrow"
+                    icon="codicon:triangle-down"
+                    width="15"
+                    height="15"
+                    style="color: var(--accent-color);"
+                  />
+                </summary>
+                <ol class="mobile-submenu">
+                  {item?.submenu?.map((sub: SecondaryMenuItem) => {
+                    const isSubActive = pagePathname === sub.link;
+                    return (
+                      <li>
+                        {sub.submenu && sub.submenu.length > 0 ? (
+                          <details class="mobile-details" open={sub.submenu.some(subsub => pagePathname === subsub.link)}>
+                            <summary class:list={["menu__summary", { active: isSubActive }]}>
+                              {sub.text}
+                              <iconify-icon
+                                class="iconify-arrow"
+                                icon="codicon:triangle-down"
+                                width="15"
+                                height="15"
+                                style="color: var(--accent-color);"
+                              />
+                            </summary>
+                            <ol class="mobile-subsubmenu">
+                              {sub.submenu.map((subsub: TertiaryMenuItem) => {
+                                const isSubSubActive = pagePathname === subsub.link;
+                                return (
+                                  <li class="mobile-submenu__item secondary">
+                                    <a
+                                      class:list={["menu__link", "mobile-menu__link", { active: isSubSubActive }]}
+                                      href={subsub.link}
+                                    >
+                                      {subsub.text}
+                                    </a>
+                                  </li>
+                                );
+                              })}
+                            </ol>
+                          </details>
+                        ) : (
+                          <a class:list={["menu__link", "mobile-menu__link", { active: isSubActive }]} href={sub.link}>
+                            {sub.text}
+                          </a>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ol>
+              </details>
+            ) : (
+              <a class:list={["mobile-menu__link", { active: isActive }]} href={item.link}>
                 {item.text}
-                <iconify-icon
-                  class="iconify-arrow"
-                  icon="codicon:triangle-down"
-                  width="15"
-                  height="15"
-                  style="color: var(--accent-color);"
-                />
-              </summary>
-              <ol class="mobile-submenu">
-                {item?.submenu?.map((sub: SecondaryMenuItem) => (
-                  <li>
-                    {sub.submenu && sub.submenu.length > 0 ? (
-                      <details class="mobile-details">
-                        <summary class="menu__summary">
-                          {sub.text}
-                          <iconify-icon
-                            class="iconify-arrow"
-                            icon="codicon:triangle-down"
-                            width="15"
-                            height="15"
-                            style="color: var(--accent-color);"
-                          />
-                        </summary>
-                        <ol class="mobile-subsubmenu">
-                          {sub.submenu.map((subsub: TertiaryMenuItem) => (
-                            <li class="mobile-submenu__item secondary">
-                              <a
-                                class="menu__link mobile-menu__link"
-                                href={subsub.link}
-                              >
-                                {subsub.text}
-                              </a>
-                            </li>
-                          ))}
-                        </ol>
-                      </details>
-                    ) : (
-                      <a class="menu__link mobile-menu__link" href={sub.link}>
-                        {sub.text}
-                      </a>
-                    )}
-                  </li>
-                ))}
-              </ol>
-            </details>
-          ) : (
-            <a class="mobile-menu__link" href={item.link}>
-              {item.text}
-            </a>
-          )}
-        </li>
-      ))
+              </a>
+            )}
+          </li>
+        );
+      })
     }
   </ol>
   <slot name="slot-panel" />
@@ -122,7 +135,15 @@ const pagePathname = Astro.url.pathname;
     }
 
     a {
-      color: var(--text-color, #fff);
+      color: color-mix(
+        in srgb,
+        var(--accent-color, #00ffff) 30%,
+        var(--text-color, #ffffff) 70%
+      );
+    }
+
+    .active {
+      color: var(--accent-color, #00ffff) !important;
     }
   }
 
@@ -139,7 +160,7 @@ const pagePathname = Astro.url.pathname;
 
   .mobile-menu li a {
     border: solid 1px
-      color-mix(in srgb, var(--accent-color, #00ffff) 20%, transparent);
+      color-mix(in srgb, var(--accent-color, #00ffff) 15%, transparent);
     border-radius: 4px;
     width: 100%;
     height: 4rem;

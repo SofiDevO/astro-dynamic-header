@@ -1,9 +1,11 @@
 ---
 export interface Props {
+  /** Override the default color of the hamburger lines */
   color?: string;
 }
 
-const { color = "var(--color-hamburger-lines, #fff)" } = Astro.props;
+const { color = "var(--text-color, var(--color-hamburger-lines, #fff))" } =
+  Astro.props;
 ---
 
 <button
@@ -23,14 +25,16 @@ const { color = "var(--color-hamburger-lines, #fff)" } = Astro.props;
     font: inherit;
     overflow: visible;
     margin: 0;
-    padding: 15px;
+    padding: 10px;
     cursor: pointer;
     transition-timing-function: linear;
     transition-duration: 0.15s;
-    transition-property: opacity, filter;
+    transition-property: opacity, filter, border-color;
     text-transform: none;
     color: inherit;
-    border: 0;
+    border: 1px solid
+      color-mix(in srgb, var(--text-color, #fff) 25%, transparent);
+    border-radius: 8px;
     background-color: transparent;
 
     @media screen and (max-width: 768px) {
@@ -61,7 +65,10 @@ const { color = "var(--color-hamburger-lines, #fff)" } = Astro.props;
   .hamburger-inner,
   .hamburger-inner::before,
   .hamburger-inner::after {
-    background-color: var(--hamburger-color, var(--color-hamburger-lines, #fff));
+    background-color: var(
+      --hamburger-color,
+      var(--color-hamburger-lines, #fff)
+    );
     position: absolute;
     width: 40px;
     height: 4px;
@@ -88,12 +95,16 @@ const { color = "var(--color-hamburger-lines, #fff)" } = Astro.props;
   }
 
   .hamburger--collapse .hamburger-inner:before {
-    transition: top 0.12s cubic-bezier(0.33333, 0.66667, 0.66667, 1) 0.2s, transform 0.13s cubic-bezier(0.55, 0.055, 0.675, 0.19);
+    transition:
+      top 0.12s cubic-bezier(0.33333, 0.66667, 0.66667, 1) 0.2s,
+      transform 0.13s cubic-bezier(0.55, 0.055, 0.675, 0.19);
   }
 
   .hamburger--collapse .hamburger-inner:after {
     top: -20px;
-    transition: top 0.2s cubic-bezier(0.33333, 0.66667, 0.66667, 1) 0.2s, opacity 0.1s linear;
+    transition:
+      top 0.2s cubic-bezier(0.33333, 0.66667, 0.66667, 1) 0.2s,
+      opacity 0.1s linear;
   }
 
   /* Animation */
@@ -105,13 +116,17 @@ const { color = "var(--color-hamburger-lines, #fff)" } = Astro.props;
 
   .hamburger--collapse.is-active .hamburger-inner:before {
     top: 0;
-    transition: top 0.1s cubic-bezier(0.33333, 0, 0.66667, 0.33333) 0.16s, transform 0.13s cubic-bezier(0.215, 0.61, 0.355, 1) 0.25s;
+    transition:
+      top 0.1s cubic-bezier(0.33333, 0, 0.66667, 0.33333) 0.16s,
+      transform 0.13s cubic-bezier(0.215, 0.61, 0.355, 1) 0.25s;
     transform: rotate(-90deg);
   }
 
   .hamburger--collapse.is-active .hamburger-inner:after {
     top: 0;
-    transition: top 0.2s cubic-bezier(0.33333, 0, 0.66667, 0.33333), opacity 0.1s linear 0.22s;
+    transition:
+      top 0.2s cubic-bezier(0.33333, 0, 0.66667, 0.33333),
+      opacity 0.1s linear 0.22s;
     opacity: 0;
   }
 </style>

@@ -2,8 +2,23 @@
 import type { MenuItem, SecondaryMenuItem, TertiaryMenuItem } from "./index.js";
 
 export interface Props {
+  /**
+   * Header type for styling.
+   * @example "floating"
+   */
+  type?: "floating" | "fullscreen";
+  /** Array of menu items to display. */
   menuItems?: MenuItem[];
+  /**
+   * Whether to show the home link in the menu.
+   * @default true
+   */
   showHomeLink?: boolean;
+  /**
+   * Text for the home link.
+   * @default "Home"
+   */
+
   homeText?: string;
 }
 
