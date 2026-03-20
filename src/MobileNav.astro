@@ -1,21 +1,11 @@
 ---
+import type { MenuItem, SecondaryMenuItem, TertiaryMenuItem } from "./index.js";
+
 export interface Props {
   type?: "floating" | "fullscreen";
-  menuItems?: Array<{
-    link: string;
-    text: string;
-    submenu?: Array<{
-      link: string;
-      text: string;
-      submenu?: Array<{
-        link: string;
-        text: string;
-      }>;
-    }>;
-  }>;
+  menuItems?: MenuItem[];
   showHomeLink?: boolean;
   homeText?: string;
-  accentColor?: string;
 }
 
 const { type } = Astro.props;
@@ -24,7 +14,6 @@ const {
   menuItems = [],
   showHomeLink = true,
   homeText = "Home",
-  accentColor = "var(--light-spot-color, #00ffff)",
 } = Astro.props;
 
 const pagePathname = Astro.url.pathname;
@@ -33,7 +22,6 @@ const pagePathname = Astro.url.pathname;
 <nav
   class={`mobile-header__menu mobile-header__menu--${type}`}
   id="mobile-header-menu"
-  style={`--mobile-accent-color: ${accentColor};`}
 >
   <ol class="mobile-menu">
     {
@@ -50,7 +38,7 @@ const pagePathname = Astro.url.pathname;
       )
     }
     {
-      menuItems?.map((item: any) => (
+      menuItems?.map((item: MenuItem) => (
         <li>
           {item.submenu ? (
             <details class="mobile-details">
@@ -61,11 +49,11 @@ const pagePathname = Astro.url.pathname;
                   icon="codicon:triangle-down"
                   width="15"
                   height="15"
-                  style={`color: ${accentColor};`}
+                  style="color: var(--accent-color);"
                 />
               </summary>
               <ol class="mobile-submenu">
-                {item?.submenu?.map((sub:any) => (
+                {item?.submenu?.map((sub: SecondaryMenuItem) => (
                   <li>
                     {sub.submenu && sub.submenu.length > 0 ? (
                       <details class="mobile-details">
@@ -76,11 +64,11 @@ const pagePathname = Astro.url.pathname;
                             icon="codicon:triangle-down"
                             width="15"
                             height="15"
-                            style={`color: ${accentColor};`}
+                            style="color: var(--accent-color);"
                           />
                         </summary>
                         <ol class="mobile-subsubmenu">
-                          {sub.submenu.map((subsub:any) => (
+                          {sub.submenu.map((subsub: TertiaryMenuItem) => (
                             <li class="mobile-submenu__item secondary">
                               <a
                                 class="menu__link mobile-menu__link"
@@ -125,16 +113,16 @@ const pagePathname = Astro.url.pathname;
       position: fixed;
       top: -11px;
       left: 0;
-      background: #151515;
+      background: var(--bg-color-opaque, #151515);
       z-index: 20;
-      transition: transform 0.3s ease-in-out;
+      transition: transform 0.3s ease-in-out, background-color 0.3s ease;
       transform: translateX(100%);
       padding: 10rem 2rem 2rem;
-      color: var(--mobile-accent-color);
+      color: var(--text-color, #fff);
     }
 
     a {
-      color: var(--mobile-accent-color);
+      color: var(--text-color, #fff);
     }
   }
 
@@ -151,7 +139,7 @@ const pagePathname = Astro.url.pathname;
 
   .mobile-menu li a {
     border: solid 1px
-      color-mix(in srgb, var(--mobile-accent-color) 20%, transparent);
+      color-mix(in srgb, var(--accent-color, #00ffff) 20%, transparent);
     border-radius: 4px;
     width: 100%;
     height: 4rem;
@@ -171,7 +159,7 @@ const pagePathname = Astro.url.pathname;
   .mobile-details summary {
     background: linear-gradient(
       to right,
-      color-mix(in srgb, var(--mobile-accent-color) 20%, transparent),
+      color-mix(in srgb, var(--accent-color, #00ffff) 20%, transparent),
       transparent
     );
     border-radius: 4px;
@@ -207,7 +195,7 @@ const pagePathname = Astro.url.pathname;
 
   .mobile-submenu,
   .mobile-subsubmenu {
-    border-left: dashed 1px var(--mobile-accent-color);
+    border-left: dashed 1px var(--accent-color, #00ffff);
     padding-left: 2rem;
     margin-left: 1rem;
     margin-top: 1rem;
@@ -230,7 +218,7 @@ const pagePathname = Astro.url.pathname;
     width: 100%;
     font-size: 1.7rem;
     height: 5rem;
-    color: #fff;
+    color: inherit;
     display: flex;
     align-items: center;
   }

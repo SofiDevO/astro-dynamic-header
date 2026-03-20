@@ -3,49 +3,69 @@ import HamburgerButton from "./HamburgerButton.astro";
 import NavMenu from "./NavMenu.astro";
 import MobileNav from "./MobileNav.astro";
 
+import type {
+  LogoConfig,
+  NavConfig,
+  DualThemeConfig,
+  CustomClassNames,
+} from "./index.js";
+
 export interface Props {
   headerType?: "floating" | "fullscreen";
-  // properties for logo
-  logoSrc?: string;
-  logoAlt?: string;
-  logoWidth?: string;
-  logoText?: string;
-  logoTextSize?: string;
-  logoTextColor?: string;
-  // properties for navigation
-  homeUrl?: string;
-  menuItems?: Array<{
-    link: string;
-    text: string;
-    submenu?: Array<{
-      link: string;
-      text: string;
-      submenu?: Array<{
-        link: string;
-        text: string;
-      }>;
-    }>;
-  }>;
-  // styles
-  backgroundColor?: string;
-  backdropBlur?: string;
-  zIndex?: number;
+  preset?: "light" | "dark" | "auto";
+  logo?: LogoConfig;
+  navigation?: NavConfig;
+  theme?: DualThemeConfig;
+  classNames?: CustomClassNames;
 }
 
 const {
   headerType = "floating",
-  logoSrc = "/logo.png",
-  logoAlt = "Logo",
-  logoWidth = "55px",
-  logoText = "",
-  logoTextSize = "1em",
-  logoTextColor = "#ffffff",
-  homeUrl = "/",
-  menuItems = [],
-  backgroundColor = "#0d0d0dcc",
-  backdropBlur = "blur(20px)",
-  zIndex = 10
+  preset = "auto",
+  logo = {},
+  navigation = {},
+  theme = {},
+  classNames = {},
 } = Astro.props;
+
+// Default theme configuration
+const defaultThemes = {
+  light: {
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    backgroundColorOpaque: "rgb(255, 255, 255)",
+    backdropBlur: "blur(20px)",
+    zIndex: 10,
+    textColor: "#1a1a1a",
+    accentColor: "#3e1c71",
+  },
+  dark: {
+    backgroundColor: "#0d0d0dcc",
+    backgroundColorOpaque: "#0d0d0d",
+    backdropBlur: "blur(20px)",
+    zIndex: 10,
+    textColor: "#ffffff",
+    accentColor: "#00ffff",
+  },
+};
+
+// Merge with user overrides
+const lightTheme = { ...defaultThemes.light, ...theme.light };
+const darkTheme = { ...defaultThemes.dark, ...theme.dark };
+
+// Navigation configuration
+const { homeUrl = "/", menuItems = [] } = navigation;
+
+// Logo configuration
+const {
+  src: logoSrc = "/logo.png",
+  alt: logoAlt = "Logo",
+  width: logoWidth = "55px",
+  text: logoText = "",
+  textSize: logoTextSize = "1em",
+  textColor: logoTextColor = "inherit", // Will inherit from theme text-color
+} = logo;
+
+const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
 ---
 
 <script>
@@ -64,7 +84,7 @@ const {
     private init(): void {
       if (this.hamburgerBtn && this.mobileMenu) {
         this.hamburgerBtn.addEventListener("click", () => this.toggleMenu());
-        this.links.forEach(link => {
+        this.links.forEach((link) => {
           link.addEventListener("click", () => this.closeMenu());
         });
       }
@@ -85,38 +105,134 @@ const {
     }
   }
 
-  // Auto-initialize when DOM is ready
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener("DOMContentLoaded", () => {
     new HamburgerController();
   });
 </script>
 
-<div class={`header__container header__container--${headerType}`} style={`z-index: ${zIndex};`}>
-  <header class={`header header--${headerType}`} style={`background-color: ${backgroundColor}; backdrop-filter: ${backdropBlur}; -webkit-backdrop-filter: ${backdropBlur};`}>
-    <a class="logo__container" href={homeUrl}>
-      <img class="header__logo" src={logoSrc} alt={logoAlt} style={`width: ${logoWidth};`} />
-      {logoText && <span class="header__logo-text" style={`color: ${logoTextColor}; font-size: ${logoTextSize};`}>{logoText}</span>}
+<div
+  class:list={[
+    "header__container",
+    `header__container--${headerType}`,
+    classNames.container,
+  ]}
+  style={{ zIndex: lightTheme.zIndex }}
+>
+  <header
+    class:list={["header", `header--${headerType}`, forcedClass, classNames.header]}
+    style={{
+      "--l-bg": lightTheme.backgroundColor,
+      "--l-bg-opaque": lightTheme.backgroundColorOpaque,
+      "--l-text": lightTheme.textColor,
+      "--l-accent": lightTheme.accentColor,
+      "--l-blur": lightTheme.backdropBlur,
+      "--d-bg": darkTheme.backgroundColor,
+      "--d-bg-opaque": darkTheme.backgroundColorOpaque,
+      "--d-text": darkTheme.textColor,
+      "--d-accent": darkTheme.accentColor,
+      "--d-blur": darkTheme.backdropBlur,
+    }}
+  >
+    <a class:list={["logo__container", classNames.logo]} href={homeUrl}>
+      <img
+        class="header__logo"
+        src={logoSrc}
+        alt={logoAlt}
+        style={{ width: logoWidth }}
+      />
+      {
+        logoText && (
+          <span
+            class:list={["header__logo-text", classNames.logoText]}
+            style={{ color: logoTextColor, fontSize: logoTextSize }}
+          >
+            {logoText}
+          </span>
+        )
+      }
     </a>
-    <NavMenu menuItems={menuItems} />
-    {Astro.slots.has('actions') && (
-      <div class="actions-desktop">
-        <slot name="actions" />
-      </div>
-    )}
-    <HamburgerButton />
-    <MobileNav menuItems={menuItems}  type={headerType}>
-      {Astro.slots.has('actions') && (
-        <div class="actions-mobile" slot="slot-panel">
+    
+    <div class:list={["nav-menu-wrapper", classNames.nav]}>
+      <NavMenu menuItems={menuItems} />
+    </div>
+
+    {
+      Astro.slots.has("actions") && (
+        <div class="actions-desktop">
           <slot name="actions" />
         </div>
-      )}
+      )
+    }
+    
+    <HamburgerButton />
+    
+    <MobileNav 
+      menuItems={menuItems} 
+      type={headerType} 
+    >
+      {
+        Astro.slots.has("actions") && (
+          <div class="actions-mobile" slot="slot-panel">
+            <slot name="actions" />
+          </div>
+        )
+      }
     </MobileNav>
-
   </header>
 </div>
 
-<style is:inline >
-  /* Base styles for header container */
+<style is:inline>
+  .header {
+    --bg-color: var(--l-bg);
+    --bg-color-opaque: var(--l-bg-opaque);
+    --text-color: var(--l-text);
+    --accent-color: var(--l-accent);
+    --backdrop-blur: var(--l-blur);
+
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: space-between;
+    padding: 1em 2em;
+    background-color: var(--bg-color);
+    backdrop-filter: var(--backdrop-blur);
+    -webkit-backdrop-filter: var(--backdrop-blur);
+    color: var(--text-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
+
+    @media (width < 768px) {
+      align-self: flex-end;
+      padding: 0.4em;
+      margin: 0 auto;
+    }
+  }
+
+  /* Automatic dark mode detection via root class */
+  :root.dark .header:not(.header--force-light) {
+    --bg-color: var(--d-bg);
+    --bg-color-opaque: var(--d-bg-opaque);
+    --text-color: var(--d-text);
+    --accent-color: var(--d-accent);
+    --backdrop-blur: var(--d-blur);
+  }
+
+  /* Forced themes */
+  .header--force-dark {
+    --bg-color: var(--d-bg) !important;
+    --bg-color-opaque: var(--d-bg-opaque) !important;
+    --text-color: var(--d-text) !important;
+    --accent-color: var(--d-accent) !important;
+    --backdrop-blur: var(--d-blur) !important;
+  }
+
+  .header--force-light {
+    --bg-color: var(--l-bg) !important;
+    --bg-color-opaque: var(--l-bg-opaque) !important;
+    --text-color: var(--l-text) !important;
+    --accent-color: var(--l-accent) !important;
+    --backdrop-blur: var(--l-blur) !important;
+  }
+
   .header__container {
     width: 100%;
     display: flex;
@@ -131,43 +247,24 @@ const {
     }
   }
 
-  /* Floating header container styles */
   .header__container--floating {
-    padding: .5em;
+    padding: 0.5em;
   }
 
-  /* Fullscreen header container styles */
   .header__container--fullscreen {
     padding: 0;
   }
 
-  /* Base styles for header */
-  .header {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    justify-content: space-between;
-    padding: 1em 2em;
-
-    @media (width < 768px) {
-      align-self: flex-end;
-      padding: 0.4em;
-      margin: 0 auto;
-    }
-  }
-
-  /* Floating header styles */
   .header--floating {
     max-width: 1100px;
     border-radius: 20px;
-    padding: .7em 1em;
+    padding: 0.7em 1em;
 
     @media (width < 768px) {
       max-width: 95%;
     }
   }
 
-  /* Fullscreen header styles */
   .header--fullscreen {
     border-radius: 0;
     padding: 1em 2em;
@@ -182,16 +279,17 @@ const {
     display: flex;
     align-items: center;
     text-decoration: none;
-    & span{
+    color: inherit;
+    & span {
       font-weight: 600;
     }
   }
+  
   .header__logo {
     margin-right: 1em;
     object-fit: contain;
   }
 
-  /* Actions visibility control */
   .actions-desktop {
     @media (width < 768px) {
       display: none;
@@ -205,7 +303,6 @@ const {
     }
   }
 
-  /* Adjust transform for fullscreen header */
   .header--fullscreen .mobile-header__menu.is-active {
     transform: translate(0%);
   }
