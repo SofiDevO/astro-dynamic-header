@@ -2,23 +2,24 @@
 import HamburgerButton from "./HamburgerButton.astro";
 import NavMenu from "./NavMenu.astro";
 import MobileNav from "./MobileNav.astro";
+import { defaultThemes } from "./defaults.js";
 
 import type {
   LogoConfig,
   NavConfig,
   DualThemeConfig,
-  CustomClassNames,
+  HeaderClassNames,
 } from "./index.js";
 
 export interface Props {
-  /** 
+  /**
    * Layout style.
    * - "floating": Centered with max-width and rounded corners.
    * - "fullscreen": Full width with no border radius.
    * @default "floating"
    */
   headerType?: "floating" | "fullscreen";
-  /** 
+  /**
    * Theme behavior.
    * - "light": Force light mode.
    * - "dark": Force dark mode.
@@ -32,11 +33,13 @@ export interface Props {
   navigation?: NavConfig;
   /** Custom theme overrides for light and dark modes. */
   theme?: DualThemeConfig;
-  /** 
-   * Custom CSS classes for specific internal elements.
-   * @example { header: "shadow-lg", nav: "ml-auto" }
+  /**
+   * High-level CSS class overrides for structural wrapper elements.
+   * For fine-grained nav/logo element classes, use the nested `xxx__class`
+   * props inside `navigation` or `logo` instead.
+   * @example { header: "shadow-lg", container: "top-4" }
    */
-  classNames?: CustomClassNames;
+  classNames?: HeaderClassNames;
 }
 
 const {
@@ -49,7 +52,6 @@ const {
 } = Astro.props;
 
 if (import.meta.env.DEV) {
-  // Check if logo is being passed as a string (legacy)
   if (typeof logo === "string") {
     console.warn(
       "[@sofidevo/astro-dynamic-header] BREAKING CHANGE: The 'logo' prop now expects an object. Please use logo={{ src: '...' }} instead.",
@@ -62,32 +64,18 @@ if (import.meta.env.DEV) {
   }
 }
 
-// Default theme configuration
-const defaultThemes = {
-  light: {
-    backgroundColor: "rgba(255, 255, 255, 0.9)",
-    backgroundColorOpaque: "rgb(255, 255, 255)",
-    backdropBlur: "blur(20px)",
-    zIndex: 10,
-    textColor: "#1a1a1a",
-    accentColor: "#3e1c71",
-  },
-  dark: {
-    backgroundColor: "#0d0d0dcc",
-    backgroundColorOpaque: "#0d0d0d",
-    backdropBlur: "blur(20px)",
-    zIndex: 10,
-    textColor: "#ffffff",
-    accentColor: "#00ffff",
-  },
-};
-
-// Merge with user overrides
+// Merge user theme overrides with defaults
 const lightTheme = { ...defaultThemes.light, ...theme.light };
 const darkTheme = { ...defaultThemes.dark, ...theme.dark };
 
 // Navigation configuration
-const { homeUrl = "/", menuItems = [] } = navigation;
+const {
+  homeUrl = "/",
+  menuItems = [],
+  header__menu__class,
+  header__item__class,
+  menu__link__class,
+} = navigation;
 
 // Logo configuration
 const {
@@ -97,6 +85,8 @@ const {
   text: logoText = "",
   textSize: logoTextSize = "1em",
   textColor: logoTextColor = "inherit", // Will inherit from theme text-color
+  logo__container__class,
+  logo__text__class,
 } = logo;
 
 const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
@@ -172,7 +162,10 @@ const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
       "--d-blur": darkTheme.backdropBlur,
     }}
   >
-    <a class:list={["logo__container", classNames.logo]} href={homeUrl}>
+    <a
+      class:list={["logo__container", logo__container__class, classNames.logo]}
+      href={homeUrl}
+    >
       <img
         class="header__logo"
         src={logoSrc}
@@ -182,7 +175,11 @@ const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
       {
         logoText && (
           <span
-            class:list={["header__logo-text", classNames.logoText]}
+            class:list={[
+              "header__logo-text",
+              logo__text__class,
+              classNames.logoText,
+            ]}
             style={{ color: logoTextColor, fontSize: logoTextSize }}
           >
             {logoText}
@@ -192,7 +189,12 @@ const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
     </a>
 
     <div class:list={["nav-menu-wrapper", classNames.nav]}>
-      <NavMenu menuItems={menuItems} />
+      <NavMenu
+        menuItems={menuItems}
+        header__menu__class={header__menu__class}
+        header__item__class={header__item__class}
+        menu__link__class={menu__link__class}
+      />
     </div>
 
     {
@@ -203,9 +205,13 @@ const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
       )
     }
 
-    <HamburgerButton />
+    <HamburgerButton color={lightTheme.textColor} />
 
-    <MobileNav menuItems={menuItems} type={headerType}>
+    <MobileNav
+      menuItems={menuItems}
+      type={headerType}
+      mobileNav__class={classNames.mobileNav}
+    >
       {
         Astro.slots.has("actions") && (
           <div class="actions-mobile" slot="slot-panel">

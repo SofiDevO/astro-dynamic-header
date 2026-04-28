@@ -3,7 +3,10 @@
 A dynamic, responsive header component for Astro projects that can switch between floating and fullscreen styles with multi-level dropdown navigation support.
 
 > [!WARNING]
-> **Breaking Changes**: Version 2.0+ introduces a restructured configuration object. If you are upgrading from an older version, please review the [Component Props](#component-props) and the [Comprehensive Example](#comprehensive-example) to migrate your configuration.
+> **Breaking Changes — v2.0+**: The `logo` and `navigation` props were restructured from strings/arrays to configuration objects. See the [Component Props](#component-props) and [Comprehensive Example](#comprehensive-example) to migrate.
+
+> [!NOTE]
+> **What's new — v2.1**: `CustomClassNames` has been renamed `HeaderClassNames` (the old name still works as an alias). New nested class props added to `LogoConfig` and `NavConfig`. New `mobileNav` slot in `HeaderClassNames`. `defaultThemes` is now exported for use outside the component. See the [Changelog](#changelog) section below.
 
 ## Features
 
@@ -12,7 +15,8 @@ A dynamic, responsive header component for Astro projects that can switch betwee
 - **Multi-level Dropdowns**: Support for nested navigation menus
 - **Slot Support**: Customizable slots for desktop header and mobile panel content
 - **TypeScript Support**: Full type safety and IntelliSense
-- **Customizable**: Extensive customization options for colors, sizes, and behavior
+- **Two-layer customization**: High-level `classNames` prop + fine-grained nested class props inside `navigation` and `logo`
+- **Exportable defaults**: Import and extend `defaultThemes` from your own code
 - **Astro Optimized**: Built specifically for Astro framework
 
 ### Live demo
@@ -45,11 +49,9 @@ By default, the header uses `preset="auto"`, which automatically detects the the
 ---
 import Header from '@sofidevo/astro-dynamic-header/Header';
 
-
-const =  menuItems: [
-    { link: '/about', text: 'About' },
-  ]
-
+const menuItems = [
+  { link: '/about', text: 'About' },
+];
 ---
 
 <!-- Detects .dark class on root automatically -->
@@ -92,14 +94,14 @@ const theme = {
 
 ### Header Component
 
-| Prop         | Type                          | Default      | Description                                |
-| ------------ | ----------------------------- | ------------ | ------------------------------------------ |
-| `headerType` | `"floating" \| "fullscreen"`  | `"floating"` | Header layout style                        |
-| `preset`     | `"light" \| "dark" \| "auto"` | `"auto"`     | Theme behavior. `auto` follows root class. |
-| `logo`       | `LogoConfig`                  | `{}`         | Logo configuration object                  |
-| `navigation` | `NavConfig`                   | `{}`         | Navigation configuration object            |
-| `theme`      | `DualThemeConfig`             | `{}`         | Custom theme overrides for light/dark      |
-| `classNames` | `CustomClassNames`            | `{}`         | Custom class names for CSS Modules         |
+| Prop         | Type                          | Default      | Description                                    |
+| ------------ | ----------------------------- | ------------ | ---------------------------------------------- |
+| `headerType` | `"floating" \| "fullscreen"`  | `"floating"` | Header layout style                            |
+| `preset`     | `"light" \| "dark" \| "auto"` | `"auto"`     | Theme behavior. `auto` follows root class.     |
+| `logo`       | `LogoConfig`                  | `{}`         | Logo configuration object                      |
+| `navigation` | `NavConfig`                   | `{}`         | Navigation configuration object                |
+| `theme`      | `DualThemeConfig`             | `{}`         | Custom theme overrides for light/dark          |
+| `classNames` | `HeaderClassNames`            | `{}`         | High-level class overrides for layout elements |
 
 ### Config Objects
 
@@ -135,41 +137,44 @@ const theme = {
 }} />
 ```
 
-#### CustomClassNames
+#### CustomClassNames → HeaderClassNames
 
-The `classNames` prop allows you to inject custom CSS classes (such as Tailwind CSS utility classes) into specific high-level elements of the Header component. This provides a bridge between the component's internal styles and your project's global styling system.
+> [!NOTE]
+> `CustomClassNames` was renamed to `HeaderClassNames` in v2.1. The old name still works as a type alias — no migration required.
 
-| Property    | Target Element                                  | Purpose & Common Use Cases                                                                                               |
-| ----------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `container` | Outer `div` wrapping the header                 | **Positioning & Layout**: Use for `top-0`, `z-50`, `fixed`, or adjusting the `max-width` and `mx-auto` logic.           |
-| `header`    | Inner `<header>` element                        | **Appearance**: The best place for shadows (`shadow-md`), borders (`border-b`), or custom transition durations.          |
-| `logo`      | `<a>` tag surrounding the logo                  | **Interactions**: Add hover states, custom focus rings, or adjust the flex alignment of the logo group.                  |
-| `logoText`  | `<span>` tag containing the logo text           | **Typography**: Override font weights, apply text shadows, or use specific tracking/leading classes.                       |
-| `nav`       | `div` wrapping the desktop navigation items      | **Desktop Layout**: Adjust spacing between the logo and the menu, or add responsive visibility classes (`hidden md:flex`). |
+The `classNames` prop targets the **structural wrapper elements** of the Header. For fine-grained control of individual nav links or the logo internals, use the nested `xxx__class` props inside the `navigation` or `logo` config objects instead.
 
-##### Advanced Usage Examples
+| Property    | Target Element                                | Purpose & Common Use Cases                                                                                      |
+| ----------- | --------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `container` | Outer `div` wrapping the header               | **Positioning & Layout**: `top-0`, `z-50`, `fixed`, adjusting `max-width` and `mx-auto` logic.                  |
+| `header`    | Inner `<header>` element                      | **Appearance**: Shadows (`shadow-md`), borders (`border-b`), or custom transition durations.                    |
+| `logo`      | `<a>` tag surrounding the logo                | **Interactions**: Hover states, custom focus rings, or adjusting the flex alignment of the logo group.          |
+| `logoText`  | `<span>` tag containing the logo text         | **Typography**: Font weights, text shadows, or specific tracking/leading classes.                               |
+| `nav`       | `<div>` wrapping the desktop navigation items | **Desktop Layout**: Spacing between the logo and the menu, or responsive visibility classes (`hidden md:flex`). |
+| `mobileNav` | Root `<nav>` of the mobile slide-in panel     | **Mobile Panel**: Extra backdrop blur, custom z-index, slide-in overrides.                                      |
 
-**Implementing a Premium Shadow & Border (Tailwind):**
-Ideal for creating a modern "glass" effect with a subtle border and shadow that adapts to dark mode.
+##### Usage Examples
+
+**Premium Shadow & Border:**
 
 ```astro
-<Header 
-  classNames={{ 
+<Header
+  classNames={{
     header: "shadow-xl border-b border-black/5 dark:border-white/10 transition-all duration-500",
-    container: "top-4 px-6"
-  }} 
+    container: "top-4 px-6",
+    mobileNav: "backdrop-blur-md",
+  }}
 />
 ```
 
-**Custom Typography for Logo & Nav Spacing:**
-Perfect for matching the header with your brand's specific typography and layout requirements.
+**Custom Typography & Nav Spacing:**
 
 ```astro
-<Header 
-  classNames={{ 
+<Header
+  classNames={{
     logoText: "tracking-tighter font-black italic uppercase",
-    nav: "ml-auto gap-8" /* Moves menu to the right and increases gap */
-  }} 
+    nav: "ml-auto gap-8",
+  }}
 />
 ```
 
@@ -178,21 +183,26 @@ Perfect for matching the header with your brand's specific typography and layout
 
 #### LogoConfig
 
-| Property    | Type     | Description                                      |
-| ----------- | -------- | ------------------------------------------------ |
-| `src`       | `string` | URL of the logo image                            |
-| `alt`       | `string` | Alternative text for the logo image              |
-| `width`     | `string` | Width of the logo (e.g., "50px", "5rem")         |
-| `text`      | `string` | Text to display next to or instead of logo image |
-| `textSize`  | `string` | Font size for the logo text                      |
-| `textColor` | `string` | Color for the logo text                          |
+| Property                 | Type     | Description                                                                           |
+| ------------------------ | -------- | ------------------------------------------------------------------------------------- |
+| `src`                    | `string` | URL of the logo image                                                                 |
+| `alt`                    | `string` | Alternative text for the logo image                                                   |
+| `width`                  | `string` | Width of the logo (e.g., "50px", "5rem")                                              |
+| `text`                   | `string` | Text to display next to or instead of logo image                                      |
+| `textSize`               | `string` | Font size for the logo text                                                           |
+| `textColor`              | `string` | Color for the logo text                                                               |
+| `logo__container__class` | `string` | Extra CSS class(es) for the logo `<a>` wrapper — alternative to `classNames.logo`     |
+| `logo__text__class`      | `string` | Extra CSS class(es) for the logo text `<span>` — alternative to `classNames.logoText` |
 
 #### NavConfig
 
-| Property    | Type         | Description                             |
-| ----------- | ------------ | --------------------------------------- |
-| `homeUrl`   | `string`     | URL for the home link (defaults to `/`) |
-| `menuItems` | `MenuItem[]` | Array of navigation menu items          |
+| Property              | Type         | Description                                             |
+| --------------------- | ------------ | ------------------------------------------------------- |
+| `homeUrl`             | `string`     | URL for the home link (defaults to `/`)                 |
+| `menuItems`           | `MenuItem[]` | Array of navigation menu items                          |
+| `header__menu__class` | `string`     | Extra CSS class(es) for the desktop `<nav>` element     |
+| `header__item__class` | `string`     | Extra CSS class(es) for each top-level `<li>` menu item |
+| `menu__link__class`   | `string`     | Extra CSS class(es) for each top-level `<a>` link       |
 
 #### MenuItem
 
@@ -279,12 +289,19 @@ const theme = {
     src: "https://itssofi.dev/img/icons/sofi-icon.webp",
     alt: "My Site Logo",
     width: "44px",
+    logo__container__class: "ring-2 ring-offset-2",
   }}
   navigation={{
     homeUrl: "/",
     menuItems: menuItems,
+    header__menu__class: "flex gap-6",
+    menu__link__class: "font-medium",
   }}
   theme={theme}
+  classNames={{
+    header: "shadow-xl",
+    mobileNav: "backdrop-blur-md",
+  }}
 >
   <button slot="actions">Login</button>
 </Header>
@@ -325,9 +342,11 @@ The package provides full TypeScript support. You can import types to ensure you
 ```astro
 ---
 import Header from '@sofidevo/astro-dynamic-header/Header';
+import { defaultThemes } from '@sofidevo/astro-dynamic-header';
 import type {
   NavConfig,
   DualThemeConfig,
+  HeaderClassNames,
   MenuItem,
   SecondaryMenuItem
 } from '@sofidevo/astro-dynamic-header';
@@ -342,42 +361,44 @@ const navigation: NavConfig = {
         { link: '/hardware', text: 'Hardware' }
       ]
     }
-  ]
+  ],
+  header__menu__class: "flex gap-6",
 };
 
+// Build on top of the built-in defaults
 const theme: DualThemeConfig = {
-  light: {
-    accentColor: "#3e1c71",
-    backgroundColor: "rgba(255, 255, 255, 0.8)",
-    backgroundColorOpaque: "#ffffff"
-  },
-  dark: {
-    accentColor: "#00ffff",
-    backgroundColor: "rgba(10, 10, 10, 0.9)",
-    backgroundColorOpaque: "#0a0a0a"
-  }
+  light: { ...defaultThemes.light, accentColor: "#3e1c71" },
+  dark:  { ...defaultThemes.dark,  accentColor: "#00ffff", backgroundColor: "rgba(10, 10, 10, 0.9)" },
+};
+
+const classNames: HeaderClassNames = {
+  header: "shadow-xl",
+  mobileNav: "backdrop-blur-md",
 };
 ---
 
 <Header
   navigation={navigation}
   theme={theme}
+  classNames={classNames}
   preset="auto"
 />
 ```
 
 ### Available Types
 
-| Type                | Description                                    |
-| ------------------- | ---------------------------------------------- |
-| `MenuItem`          | Top-level menu item with optional properties   |
-| `SecondaryMenuItem` | Second-level menu item                         |
-| `TertiaryMenuItem`  | Third-level menu item                          |
-| `NavConfig`         | Main navigation configuration object           |
-| `ThemeConfig`       | Individual theme settings (colors, blur, etc.) |
-| `DualThemeConfig`   | Combined settings for light and dark modes     |
-| `LogoConfig`        | Logo image and text configuration              |
-| `HeaderProps`       | Main props for the Header component            |
+| Type                | Description                                     |
+| ------------------- | ----------------------------------------------- |
+| `MenuItem`          | Top-level menu item with optional properties    |
+| `SecondaryMenuItem` | Second-level menu item                          |
+| `TertiaryMenuItem`  | Third-level menu item                           |
+| `NavConfig`         | Navigation config (items + nested class props)  |
+| `LogoConfig`        | Logo config (image, text + nested class props)  |
+| `ThemeConfig`       | Individual theme settings (colors, blur, etc.)  |
+| `DualThemeConfig`   | Combined settings for light and dark modes      |
+| `HeaderClassNames`  | Class overrides for structural wrapper elements |
+| `CustomClassNames`  | **Deprecated alias** for `HeaderClassNames`     |
+| `HeaderProps`       | Main props for the Header component             |
 
 ## Browser Support
 
@@ -431,3 +452,52 @@ MIT License - see the [LICENSE](./LICENSE) file for details.
 ## Support
 
 If you find this package helpful, please consider giving it a star on GitHub!
+
+---
+
+## Changelog
+
+### v2.1 — Style & Customization Refactor
+
+#### New features
+
+- **`HeaderClassNames`** replaces `CustomClassNames` (alias kept — no migration required).
+  New `mobileNav` slot targets the mobile slide-in `<nav>` panel.
+
+- **Nested class props** on `LogoConfig`:
+  | Prop | Targets |
+  |------|---------|
+  | `logo__container__class` | Logo `<a>` wrapper |
+  | `logo__text__class` | Logo text `<span>` |
+
+- **Nested class props** on `NavConfig`:
+  | Prop | Targets |
+  |------|---------|
+  | `header__menu__class` | Desktop `<nav>` element |
+  | `header__item__class` | Each top-level `<li>` |
+  | `menu__link__class` | Each top-level `<a>` |
+
+- **`defaultThemes` exported** — import and spread the built-in tokens to extend them:
+  ```ts
+  import { defaultThemes } from "@sofidevo/astro-dynamic-header";
+  const theme = { dark: { ...defaultThemes.dark, accentColor: "#f43f5e" } };
+  ```
+
+#### Internal improvements
+
+- Default theme tokens extracted to `src/defaults.ts` — easier to read and maintain.
+- `HamburgerButton` color is now explicitly wired from the resolved theme (no visual change).
+
+#### Deprecations
+
+- `CustomClassNames` — use `HeaderClassNames` instead. The alias will remain until the next major version.
+
+### v2.0 — Object-based Configuration API
+
+> [!WARNING]
+> Breaking change: `logo` changed from `string` to `LogoConfig`, `navigation` changed from `MenuItem[]` to `NavConfig`.
+
+- `logo` prop restructured to `LogoConfig` object (`src`, `alt`, `width`, `text`, `textSize`, `textColor`).
+- `navigation` prop restructured to `NavConfig` object (`homeUrl`, `menuItems`).
+- `classNames` prop introduced for CSS class injection (`CustomClassNames`).
+- Dual-theme support via `DualThemeConfig` (`light` + `dark`).

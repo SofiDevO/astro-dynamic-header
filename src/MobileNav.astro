@@ -10,21 +10,22 @@ export interface Props {
   showHomeLink?: boolean;
   /** Text for the home link (defaults to "Home") */
   homeText?: string;
+  /** Extra CSS class(es) for the root mobile `<nav>` panel. */
+  mobileNav__class?: string;
 }
 
-const { type } = Astro.props;
+const { type, mobileNav__class } = Astro.props;
 
-const {
-  menuItems = [],
-  showHomeLink = true,
-  homeText = "Home",
-} = Astro.props;
+const { menuItems = [], showHomeLink = true, homeText = "Home" } = Astro.props;
 
 const pagePathname = Astro.url.pathname;
 ---
 
 <nav
-  class={`mobile-header__menu mobile-header__menu--${type}`}
+  class:list={[
+    `mobile-header__menu mobile-header__menu--${type}`,
+    mobileNav__class,
+  ]}
   id="mobile-header-menu"
 >
   <ol class="mobile-menu">
@@ -47,7 +48,10 @@ const pagePathname = Astro.url.pathname;
         return (
           <li>
             {item.submenu ? (
-              <details class="mobile-details" open={item.submenu.some(sub => pagePathname === sub.link)}>
+              <details
+                class="mobile-details"
+                open={item.submenu.some((sub) => pagePathname === sub.link)}
+              >
                 <summary class:list={["menu__summary", { active: isActive }]}>
                   {item.text}
                   <iconify-icon
@@ -64,8 +68,18 @@ const pagePathname = Astro.url.pathname;
                     return (
                       <li>
                         {sub.submenu && sub.submenu.length > 0 ? (
-                          <details class="mobile-details" open={sub.submenu.some(subsub => pagePathname === subsub.link)}>
-                            <summary class:list={["menu__summary", { active: isSubActive }]}>
+                          <details
+                            class="mobile-details"
+                            open={sub.submenu.some(
+                              (subsub) => pagePathname === subsub.link,
+                            )}
+                          >
+                            <summary
+                              class:list={[
+                                "menu__summary",
+                                { active: isSubActive },
+                              ]}
+                            >
                               {sub.text}
                               <iconify-icon
                                 class="iconify-arrow"
@@ -77,11 +91,16 @@ const pagePathname = Astro.url.pathname;
                             </summary>
                             <ol class="mobile-subsubmenu">
                               {sub.submenu.map((subsub: TertiaryMenuItem) => {
-                                const isSubSubActive = pagePathname === subsub.link;
+                                const isSubSubActive =
+                                  pagePathname === subsub.link;
                                 return (
                                   <li class="mobile-submenu__item secondary">
                                     <a
-                                      class:list={["menu__link", "mobile-menu__link", { active: isSubSubActive }]}
+                                      class:list={[
+                                        "menu__link",
+                                        "mobile-menu__link",
+                                        { active: isSubSubActive },
+                                      ]}
                                       href={subsub.link}
                                     >
                                       {subsub.text}
@@ -92,7 +111,14 @@ const pagePathname = Astro.url.pathname;
                             </ol>
                           </details>
                         ) : (
-                          <a class:list={["menu__link", "mobile-menu__link", { active: isSubActive }]} href={sub.link}>
+                          <a
+                            class:list={[
+                              "menu__link",
+                              "mobile-menu__link",
+                              { active: isSubActive },
+                            ]}
+                            href={sub.link}
+                          >
                             {sub.text}
                           </a>
                         )}
@@ -102,7 +128,10 @@ const pagePathname = Astro.url.pathname;
                 </ol>
               </details>
             ) : (
-              <a class:list={["mobile-menu__link", { active: isActive }]} href={item.link}>
+              <a
+                class:list={["mobile-menu__link", { active: isActive }]}
+                href={item.link}
+              >
                 {item.text}
               </a>
             )}
@@ -128,7 +157,9 @@ const pagePathname = Astro.url.pathname;
       left: 0;
       background: var(--bg-color-opaque, #151515);
       z-index: 20;
-      transition: transform 0.3s ease-in-out, background-color 0.3s ease;
+      transition:
+        transform 0.3s ease-in-out,
+        background-color 0.3s ease;
       transform: translateX(100%);
       padding: 10rem 2rem 2rem;
       color: var(--text-color, #fff);

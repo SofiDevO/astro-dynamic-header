@@ -18,11 +18,23 @@ export interface Props {
    * Text for the home link.
    * @default "Home"
    */
-
   homeText?: string;
+  /** Extra CSS class(es) for the `<nav>` element. */
+  header__menu__class?: string;
+  /** Extra CSS class(es) for each top-level `<li>` item. */
+  header__item__class?: string;
+  /** Extra CSS class(es) for each top-level menu `<a>` link. */
+  menu__link__class?: string;
 }
 
-const { menuItems = [], showHomeLink = true, homeText = "Home" } = Astro.props;
+const {
+  menuItems = [],
+  showHomeLink = true,
+  homeText = "Home",
+  header__menu__class,
+  header__item__class,
+  menu__link__class,
+} = Astro.props;
 
 const pagePathname = Astro.url.pathname;
 ---
@@ -129,12 +141,16 @@ const pagePathname = Astro.url.pathname;
   });
 </script>
 
-<nav class="header__menu" id="header-menu">
+<nav class:list={["header__menu", header__menu__class]} id="header-menu">
   <ul class="menu">
     {
       showHomeLink && pagePathname !== "/" && (
-        <li class="header__item">
-          <a class="menu__link" href="/" data-astro-prefetch="hover">
+        <li class:list={["header__item", header__item__class]}>
+          <a
+            class:list={["menu__link", menu__link__class]}
+            href="/"
+            data-astro-prefetch="hover"
+          >
             {homeText}
           </a>
         </li>
@@ -142,8 +158,8 @@ const pagePathname = Astro.url.pathname;
     }
     {
       menuItems.map((item: MenuItem) => (
-        <li class="menu__item">
-          <a class="menu__link" href={item.link}>
+        <li class:list={["menu__item", header__item__class]}>
+          <a class:list={["menu__link", menu__link__class]} href={item.link}>
             {item.text}
             {item.submenu && (
               <iconify-icon
