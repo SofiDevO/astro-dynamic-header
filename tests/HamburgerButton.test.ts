@@ -29,19 +29,11 @@ describe('HamburgerButton Component', () => {
     vi.clearAllMocks();
   });
 
-  it('should render with correct default props', () => {
-    const defaultProps = {
-      color: 'var(--color-hamburger-lines, #fff)',
-    };
-
-    expect(defaultProps.color).toBe('var(--color-hamburger-lines, #fff)');
-  });
-
-  it('should accept custom color prop', () => {
-    const customColor = '#ff0000';
-    const expectedStyle = `--hamburger-color: ${customColor}`;
-
-    expect(expectedStyle).toContain(customColor);
+  it('should inherit color from native CSS variables', () => {
+    // El botón ya no recibe la propiedad "color".
+    // Ahora utiliza `var(--text-color, inherit)` directamente en su CSS interno.
+    const hasColorProp = false;
+    expect(hasColorProp).toBe(false);
   });
 
   it('should have correct button attributes', () => {

@@ -1,53 +1,44 @@
 ---
-import Header from "../Header.astro";
+import Header from '../Header.astro'
+
 const menuItems = [
   {
-    link: "#",
-    text: "Services",
+    link: '#',
+    text: 'Services',
     submenu: [
-      { link: "/design", text: "Design" },
-      { link: "/consulting", text: "Consulting" },
+      { link: '/design', text: 'Design' },
+      { link: '/consulting', text: 'Consulting' },
       {
-        link: "#",
-        text: "Web Development",
+        link: '#',
+        text: 'Web Development',
         submenu: [
-          { link: "/web/frontend", text: "Frontend" },
-          { link: "/web/backend", text: "Backend" },
-          { link: "/web/fullstack", text: "Full Stack" },
+          { link: '/web/frontend', text: 'Frontend' },
+          { link: '/web/backend', text: 'Backend' },
+          { link: '/web/fullstack', text: 'Full Stack' },
         ],
       },
     ],
   },
-  { link: "/about", text: "About" },
-  { link: "/contact", text: "Contact" },
+  { link: '/about', text: 'About' },
+  { link: '/contact', text: 'Contact' },
   {
-    link: "#",
-    text: "Services",
+    link: '#',
+    text: 'Services',
     submenu: [
-      { link: "/design", text: "Design" },
-      { link: "/consulting", text: "Consulting" },
+      { link: '/design', text: 'Design' },
+      { link: '/consulting', text: 'Consulting' },
       {
-        link: "#",
-        text: "Web Development",
+        link: '#',
+        text: 'Web Development',
         submenu: [
-          { link: "/web/frontend", text: "Frontend" },
-          { link: "/web/backend", text: "Backend" },
-          { link: "/web/fullstack", text: "Full Stack" },
+          { link: '/web/frontend', text: 'Frontend' },
+          { link: '/web/backend', text: 'Backend' },
+          { link: '/web/fullstack', text: 'Full Stack' },
         ],
       },
     ],
   },
-];
-const theme = {
-  light: {
-    accentColor: "#ff0000",
-    backgroundColor: "rgba(255, 255, 255, 0.8)",
-  },
-  dark: {
-    accentColor: "#00ffff",
-    backgroundColor: "rgba(20, 20, 20, 0.9)",
-  },
-};
+]
 ---
 
 <!doctype html>
@@ -64,17 +55,32 @@ const theme = {
     <Header
       headerType="floating"
       preset="dark"
-      logo={{
-        src: "https://itssofi.dev/img/icons/sofi-icon.webp",
-        alt: "My Site Logo",
-        width: "44px",
-      }}
       navigation={{
-        homeUrl: "/",
+        homeUrl: '/',
         menuItems: menuItems,
+        header__menu__class: 'custom-menu-wrapper',
+        header__item__class: 'custom-menu-item',
+        menu__link__class: 'custom-menu-link',
       }}
-      theme={theme}
+      classNames={{
+        header: 'custom-header-wrapper',
+        container: 'custom-container',
+        mobileNav: 'custom-mobile-nav',
+      }}
     >
+      <a
+        slot="logo"
+        href="/"
+        style="display: flex; align-items: center; gap: 10px; color: inherit; text-decoration: none;"
+      >
+        <img
+          src="https://sofidev.blog/img/branding/logo.webp
+"
+          alt="My Site Logo"
+          width="44"
+        />
+        <span style="font-weight: bold; font-size: 1.2rem;">SofiDev</span>
+      </a>
       <button slot="actions">same btn</button>
     </Header>
     <main>
@@ -87,6 +93,15 @@ const theme = {
 </html>
 
 <style is:inline>
+  :root {
+    /* Nueva personalización vía CSS Variables (sin necesidad de objeto JS) */
+    --l-accent: #ff0000;
+    --l-bg: rgba(255, 255, 255, 0.8);
+
+    --d-accent: #00ffff;
+    --d-bg: rgba(20, 20, 20, 0.9);
+  }
+
   * {
     box-sizing: border-box;
     margin: 0;

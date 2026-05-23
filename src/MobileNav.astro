@@ -14,9 +14,13 @@ export interface Props {
   mobileNav__class?: string;
 }
 
-const { type, mobileNav__class } = Astro.props;
-
-const { menuItems = [], showHomeLink = true, homeText = "Home" } = Astro.props;
+const {
+  type,
+  mobileNav__class,
+  menuItems = [],
+  showHomeLink = true,
+  homeText = "Home"
+} = Astro.props;
 
 const pagePathname = Astro.url.pathname;
 ---

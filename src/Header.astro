@@ -2,10 +2,8 @@
 import HamburgerButton from "./HamburgerButton.astro";
 import NavMenu from "./NavMenu.astro";
 import MobileNav from "./MobileNav.astro";
-import { defaultThemes } from "./defaults.js";
 
 import type {
-  LogoConfig,
   NavConfig,
   DualThemeConfig,
   HeaderClassNames,
@@ -27,8 +25,7 @@ export interface Props {
    * @default "auto"
    */
   preset?: "light" | "dark" | "auto";
-  /** Logo configuration object (src, alt, text, etc.) */
-  logo?: LogoConfig;
+
   /** Navigation links and structure. */
   navigation?: NavConfig;
   /** Custom theme overrides for light and dark modes. */
@@ -45,18 +42,14 @@ export interface Props {
 const {
   headerType = "floating",
   preset = "auto",
-  logo = {},
+
   navigation = {},
   theme = {},
   classNames = {},
 } = Astro.props;
 
 if (import.meta.env.DEV) {
-  if (typeof logo === "string") {
-    console.warn(
-      "[@sofidevo/astro-dynamic-header] BREAKING CHANGE: The 'logo' prop now expects an object. Please use logo={{ src: '...' }} instead.",
-    );
-  }
+
   if (Array.isArray(navigation)) {
     console.warn(
       "[@sofidevo/astro-dynamic-header] BREAKING CHANGE: The 'navigation' prop now expects an object with 'menuItems'. Please use navigation={{ menuItems: [...] }} instead.",
@@ -64,9 +57,25 @@ if (import.meta.env.DEV) {
   }
 }
 
-// Merge user theme overrides with defaults
-const lightTheme = { ...defaultThemes.light, ...theme.light };
-const darkTheme = { ...defaultThemes.dark, ...theme.dark };
+// Map user theme overrides to CSS custom properties
+const inlineStyles: Record<string, string> = {};
+
+if (theme.light) {
+  if (theme.light.backgroundColor) inlineStyles["--l-bg"] = theme.light.backgroundColor;
+  if (theme.light.backgroundColorOpaque) inlineStyles["--l-bg-opaque"] = theme.light.backgroundColorOpaque;
+  if (theme.light.textColor) inlineStyles["--l-text"] = theme.light.textColor;
+  if (theme.light.accentColor) inlineStyles["--l-accent"] = theme.light.accentColor;
+  if (theme.light.backdropBlur) inlineStyles["--l-blur"] = theme.light.backdropBlur;
+}
+if (theme.dark) {
+  if (theme.dark.backgroundColor) inlineStyles["--d-bg"] = theme.dark.backgroundColor;
+  if (theme.dark.backgroundColorOpaque) inlineStyles["--d-bg-opaque"] = theme.dark.backgroundColorOpaque;
+  if (theme.dark.textColor) inlineStyles["--d-text"] = theme.dark.textColor;
+  if (theme.dark.accentColor) inlineStyles["--d-accent"] = theme.dark.accentColor;
+  if (theme.dark.backdropBlur) inlineStyles["--d-blur"] = theme.dark.backdropBlur;
+}
+
+const zIndex = theme.light?.zIndex ?? 10;
 
 // Navigation configuration
 const {
@@ -77,17 +86,7 @@ const {
   menu__link__class,
 } = navigation;
 
-// Logo configuration
-const {
-  src: logoSrc = "/logo.png",
-  alt: logoAlt = "Logo",
-  width: logoWidth = "55px",
-  text: logoText = "",
-  textSize: logoTextSize = "1em",
-  textColor: logoTextColor = "inherit", // Will inherit from theme text-color
-  logo__container__class,
-  logo__text__class,
-} = logo;
+
 
 const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
 ---
@@ -140,7 +139,7 @@ const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
     `header__container--${headerType}`,
     classNames.container,
   ]}
-  style={{ zIndex: lightTheme.zIndex }}
+  style={{ zIndex }}
 >
   <header
     class:list={[
@@ -149,44 +148,9 @@ const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
       forcedClass,
       classNames.header,
     ]}
-    style={{
-      "--l-bg": lightTheme.backgroundColor,
-      "--l-bg-opaque": lightTheme.backgroundColorOpaque,
-      "--l-text": lightTheme.textColor,
-      "--l-accent": lightTheme.accentColor,
-      "--l-blur": lightTheme.backdropBlur,
-      "--d-bg": darkTheme.backgroundColor,
-      "--d-bg-opaque": darkTheme.backgroundColorOpaque,
-      "--d-text": darkTheme.textColor,
-      "--d-accent": darkTheme.accentColor,
-      "--d-blur": darkTheme.backdropBlur,
-    }}
+    style={Object.keys(inlineStyles).length > 0 ? inlineStyles : undefined}
   >
-    <a
-      class:list={["logo__container", logo__container__class, classNames.logo]}
-      href={homeUrl}
-    >
-      <img
-        class="header__logo"
-        src={logoSrc}
-        alt={logoAlt}
-        style={{ width: logoWidth }}
-      />
-      {
-        logoText && (
-          <span
-            class:list={[
-              "header__logo-text",
-              logo__text__class,
-              classNames.logoText,
-            ]}
-            style={{ color: logoTextColor, fontSize: logoTextSize }}
-          >
-            {logoText}
-          </span>
-        )
-      }
-    </a>
+    <slot name="logo" />
 
     <div class:list={["nav-menu-wrapper", classNames.nav]}>
       <NavMenu
@@ -205,7 +169,7 @@ const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
       )
     }
 
-    <HamburgerButton color={lightTheme.textColor} />
+    <HamburgerButton />
 
     <MobileNav
       menuItems={menuItems}
@@ -225,11 +189,11 @@ const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
 
 <style is:inline>
   .header {
-    --bg-color: var(--l-bg);
-    --bg-color-opaque: var(--l-bg-opaque);
-    --text-color: var(--l-text);
-    --accent-color: var(--l-accent);
-    --backdrop-blur: var(--l-blur);
+    --bg-color: var(--l-bg, rgba(255, 255, 255, 0.9));
+    --bg-color-opaque: var(--l-bg-opaque, rgb(255, 255, 255));
+    --text-color: var(--l-text, #1a1a1a);
+    --accent-color: var(--l-accent, #3e1c71);
+    --backdrop-blur: var(--l-blur, blur(20px));
 
     display: flex;
     align-items: center;
@@ -253,28 +217,28 @@ const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
 
   /* Automatic dark mode detection via root class */
   :root.dark .header:not(.header--force-light) {
-    --bg-color: var(--d-bg);
-    --bg-color-opaque: var(--d-bg-opaque);
-    --text-color: var(--d-text);
-    --accent-color: var(--d-accent);
-    --backdrop-blur: var(--d-blur);
+    --bg-color: var(--d-bg, #0d0d0dcc);
+    --bg-color-opaque: var(--d-bg-opaque, #0d0d0d);
+    --text-color: var(--d-text, #ffffff);
+    --accent-color: var(--d-accent, #00ffff);
+    --backdrop-blur: var(--d-blur, blur(20px));
   }
 
   /* Forced themes */
   .header--force-dark {
-    --bg-color: var(--d-bg) !important;
-    --bg-color-opaque: var(--d-bg-opaque) !important;
-    --text-color: var(--d-text) !important;
-    --accent-color: var(--d-accent) !important;
-    --backdrop-blur: var(--d-blur) !important;
+    --bg-color: var(--d-bg, #0d0d0dcc) !important;
+    --bg-color-opaque: var(--d-bg-opaque, #0d0d0d) !important;
+    --text-color: var(--d-text, #ffffff) !important;
+    --accent-color: var(--d-accent, #00ffff) !important;
+    --backdrop-blur: var(--d-blur, blur(20px)) !important;
   }
 
   .header--force-light {
-    --bg-color: var(--l-bg) !important;
-    --bg-color-opaque: var(--l-bg-opaque) !important;
-    --text-color: var(--l-text) !important;
-    --accent-color: var(--l-accent) !important;
-    --backdrop-blur: var(--l-blur) !important;
+    --bg-color: var(--l-bg, rgba(255, 255, 255, 0.9)) !important;
+    --bg-color-opaque: var(--l-bg-opaque, rgb(255, 255, 255)) !important;
+    --text-color: var(--l-text, #1a1a1a) !important;
+    --accent-color: var(--l-accent, #3e1c71) !important;
+    --backdrop-blur: var(--l-blur, blur(20px)) !important;
   }
 
   .header__container {
@@ -319,20 +283,7 @@ const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
     }
   }
 
-  .logo__container {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-    color: inherit;
-    & span {
-      font-weight: 600;
-    }
-  }
 
-  .header__logo {
-    margin-right: 1em;
-    object-fit: contain;
-  }
 
   .actions-desktop {
     @media (width < 768px) {

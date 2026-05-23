@@ -47,56 +47,6 @@ export interface MenuItem {
 }
 
 /**
- * Configuration for the site logo.
- */
-export interface LogoConfig {
-  /**
-   * The URL of the logo image.
-   * @example "/assets/logo.png"
-   * @default "/logo.png"
-   */
-  src?: string;
-  /** Alternative text for the logo image */
-  alt?: string;
-  /**
-   * CSS width for the logo.
-   * @example "150px" or "4rem"
-   * @default "55px"
-   */
-  width?: string;
-  /**
-   * Optional text to display next to the logo image.
-   * @example "My Awesome Site"
-   */
-  text?: string;
-  /**
-   * CSS font-size for the logo text.
-   * @default "1em"
-   */
-  textSize?: string;
-  /**
-   * CSS color for the logo text.
-   * If not provided, it will inherit from the theme's text color.
-   * @default "inherit"
-   */
-  textColor?: string;
-  /**
-   * Fine-grained class override for the logo anchor (`<a>`) element.
-   * Use this instead of `classNames.logo` when you want the class to live
-   * alongside the rest of the logo configuration.
-   * @example "ring-2 ring-offset-2"
-   */
-  logo__container__class?: string;
-  /**
-   * Fine-grained class override for the logo text `<span>` element.
-   * Use this instead of `classNames.logoText` when you want the class to live
-   * alongside the rest of the logo configuration.
-   * @example "font-black italic"
-   */
-  logo__text__class?: string;
-}
-
-/**
  * Configuration for the main navigation.
  */
 export interface NavConfig {
@@ -227,8 +177,7 @@ export interface HeaderProps {
    * @default "auto"
    */
   preset?: "light" | "dark" | "auto";
-  /** Logo configuration object. */
-  logo?: LogoConfig;
+
   /** Navigation links and structure. */
   navigation?: NavConfig;
   /** Custom theme overrides. See {@link DualThemeConfig} */

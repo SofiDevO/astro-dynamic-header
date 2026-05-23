@@ -1,18 +1,11 @@
 ---
-export interface Props {
-  /** Override the default color of the hamburger lines */
-  color?: string;
-}
-
-const { color = "var(--text-color, var(--color-hamburger-lines, #fff))" } =
-  Astro.props;
+export interface Props {}
 ---
 
 <button
   class="hamburger hamburger--collapse"
   type="button"
   id="hamburger-btn"
-  style={`--hamburger-color: ${color};`}
 >
   <span class="hamburger-box">
     <span class="hamburger-inner"></span>
@@ -65,10 +58,7 @@ const { color = "var(--text-color, var(--color-hamburger-lines, #fff))" } =
   .hamburger-inner,
   .hamburger-inner::before,
   .hamburger-inner::after {
-    background-color: var(
-      --hamburger-color,
-      var(--color-hamburger-lines, #fff)
-    );
+    background-color: var(--text-color, inherit);
     position: absolute;
     width: 40px;
     height: 4px;

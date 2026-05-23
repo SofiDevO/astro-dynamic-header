@@ -3,6 +3,9 @@
 A dynamic, responsive header component for Astro projects that can switch between floating and fullscreen styles with multi-level dropdown navigation support.
 
 > [!WARNING]
+> **Breaking Changes — v2.2+**: The `logo` prop has been removed in favor of a much more flexible `logo` slot. The `color` prop has also been removed from the `HamburgerButton` component to ensure flawless dark mode synchronization. The `theme` property behavior was also refactored to prioritize native CSS variables, reducing DOM bloat and enabling purely CSS-based customization. See the [Changelog](#changelog) section below.
+
+> [!WARNING]
 > **Breaking Changes — v2.0+**: The `logo` and `navigation` props were restructured from strings/arrays to configuration objects. See the [Component Props](#component-props) and [Comprehensive Example](#comprehensive-example) to migrate.
 
 > [!NOTE]
@@ -98,7 +101,6 @@ const theme = {
 | ------------ | ----------------------------- | ------------ | ---------------------------------------------- |
 | `headerType` | `"floating" \| "fullscreen"`  | `"floating"` | Header layout style                            |
 | `preset`     | `"light" \| "dark" \| "auto"` | `"auto"`     | Theme behavior. `auto` follows root class.     |
-| `logo`       | `LogoConfig`                  | `{}`         | Logo configuration object                      |
 | `navigation` | `NavConfig`                   | `{}`         | Navigation configuration object                |
 | `theme`      | `DualThemeConfig`             | `{}`         | Custom theme overrides for light/dark          |
 | `classNames` | `HeaderClassNames`            | `{}`         | High-level class overrides for layout elements |
@@ -181,18 +183,7 @@ The `classNames` prop targets the **structural wrapper elements** of the Header.
 > [!TIP]
 > Since these classes are injected using Astro's `class:list`, you can also pass objects or arrays if you need conditional logic for your custom classes.
 
-#### LogoConfig
 
-| Property                 | Type     | Description                                                                           |
-| ------------------------ | -------- | ------------------------------------------------------------------------------------- |
-| `src`                    | `string` | URL of the logo image                                                                 |
-| `alt`                    | `string` | Alternative text for the logo image                                                   |
-| `width`                  | `string` | Width of the logo (e.g., "50px", "5rem")                                              |
-| `text`                   | `string` | Text to display next to or instead of logo image                                      |
-| `textSize`               | `string` | Font size for the logo text                                                           |
-| `textColor`              | `string` | Color for the logo text                                                               |
-| `logo__container__class` | `string` | Extra CSS class(es) for the logo `<a>` wrapper — alternative to `classNames.logo`     |
-| `logo__text__class`      | `string` | Extra CSS class(es) for the logo text `<span>` — alternative to `classNames.logoText` |
 
 #### NavConfig
 
@@ -220,6 +211,7 @@ The Header component provides a flexible slot system that allows you to add addi
 
 | Slot Name | Location              | Visibility            | Description                              |
 | --------- | --------------------- | --------------------- | ---------------------------------------- |
+| `logo`    | Header Desktop/Mobile | Always                | Add your custom logo HTML/Components     |
 | `actions` | Header & Mobile panel | Responsive visibility | Add action buttons (login, signup, etc.) |
 
 ### Example with Slots
@@ -270,39 +262,38 @@ const menuItems = [
   { link: "/contact", text: "Contact" },
 ];
 
-const theme = {
-  light: {
-    accentColor: "#ff0000",
-    backgroundColor: "rgba(255, 255, 255, 0.8)",
-  },
-  dark: {
-    accentColor: "#00ffff",
-    backgroundColor: "rgba(20, 20, 20, 0.9)",
-  },
-};
+];
 ---
+
+<style is:inline>
+  :root {
+    /* Pure CSS Theming Configuration */
+    --l-accent: #ff0000;
+    --l-bg: rgba(255, 255, 255, 0.8);
+    
+    --d-accent: #00ffff;
+    --d-bg: rgba(20, 20, 20, 0.9);
+  }
+</style>
 
 <Header
   headerType="floating"
   preset="dark"
-  logo={{
-    src: "https://itssofi.dev/img/icons/sofi-icon.webp",
-    alt: "My Site Logo",
-    width: "44px",
-    logo__container__class: "ring-2 ring-offset-2",
-  }}
   navigation={{
     homeUrl: "/",
     menuItems: menuItems,
     header__menu__class: "flex gap-6",
     menu__link__class: "font-medium",
   }}
-  theme={theme}
   classNames={{
     header: "shadow-xl",
     mobileNav: "backdrop-blur-md",
   }}
 >
+  <a slot="logo" href="/" style="display: flex; align-items: center; gap: 10px; color: inherit; text-decoration: none;">
+    <img src="https://sofidev.blog/img/branding/logo.webp" alt="My Site Logo" width="44" />
+    <span style="font-weight: bold; font-size: 1.2rem;">SofiDev</span>
+  </a>
   <button slot="actions">Login</button>
 </Header>
 ```
@@ -365,7 +356,8 @@ const navigation: NavConfig = {
   header__menu__class: "flex gap-6",
 };
 
-// Build on top of the built-in defaults
+// Prefer CSS custom properties globally rather than passing the `theme` object.
+// But you can still use the theme prop if needed:
 const theme: DualThemeConfig = {
   light: { ...defaultThemes.light, accentColor: "#3e1c71" },
   dark:  { ...defaultThemes.dark,  accentColor: "#00ffff", backgroundColor: "rgba(10, 10, 10, 0.9)" },
@@ -379,7 +371,6 @@ const classNames: HeaderClassNames = {
 
 <Header
   navigation={navigation}
-  theme={theme}
   classNames={classNames}
   preset="auto"
 />
@@ -393,7 +384,6 @@ const classNames: HeaderClassNames = {
 | `SecondaryMenuItem` | Second-level menu item                          |
 | `TertiaryMenuItem`  | Third-level menu item                           |
 | `NavConfig`         | Navigation config (items + nested class props)  |
-| `LogoConfig`        | Logo config (image, text + nested class props)  |
 | `ThemeConfig`       | Individual theme settings (colors, blur, etc.)  |
 | `DualThemeConfig`   | Combined settings for light and dark modes      |
 | `HeaderClassNames`  | Class overrides for structural wrapper elements |
@@ -456,6 +446,18 @@ If you find this package helpful, please consider giving it a star on GitHub!
 ---
 
 ## Changelog
+
+### v2.2 — Performance & DX Optimization
+
+#### Breaking changes
+
+- **Removed `logo` Object Configuration prop**: The `logo` property and `LogoConfig` interface have been removed. You should now use `<slot name="logo" />` to render your logo exactly as you need, passing native HTML or Astro components.
+- **Removed `color` prop from `HamburgerButton`**: The `HamburgerButton` now inherits `--text-color` natively via CSS, which fixes a bug where the button would not properly update its color when switching to dark mode. Any direct uses of `<HamburgerButton color="..." />` will fail to compile in TypeScript and should be updated to rely on global CSS variables or context inheritance.
+
+#### New features and enhancements
+
+- **Native CSS Variable Theming (Better DX)**: Redesigned how default styles are injected into the DOM. `Header.astro` no longer injects all default properties into `style={...}` attributes on load, solving the "DOM bloat" issue. You can now deeply customize the component purely by setting CSS variables like `--l-bg`, `--d-bg`, `--l-accent`, and `--d-accent` inside your `:root` style tag, removing the necessity to parse massive `theme` JS objects.
+- **Dead Code Elimination**: Cleaned up repetitive prop destructuring inside `MobileNav.astro`.
 
 ### v2.1 — Style & Customization Refactor
 
