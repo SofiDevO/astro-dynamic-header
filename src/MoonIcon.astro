@@ -1,0 +1,106 @@
+---
+const props = Astro.props;
+
+const regex = /\sid="(\S+)"/g;
+const counters = new Map<string, number>();
+
+function nextID(id: string) {
+  id = id.replace(/[0-9]+$/, "") || "a";
+  const count = counters.get(id) || 0;
+  counters.set(id, count + 1);
+  return count ? `${id}${count}` : id;
+}
+
+function replaceIDs(body: string) {
+  const ids: string[] = [];
+  let match;
+  while ((match = regex.exec(body))) ids.push(match[1]);
+  if (!ids.length) return body;
+  const suffix =
+    "suffix" + ((Math.random() * 16777216) | Date.now()).toString(16);
+  ids.forEach((id) => {
+    const newID = nextID(id);
+    const escapedID = id.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    body = body.replace(
+      new RegExp('([#;"])(' + escapedID + ')([")]|\\.[a-z])', "g"),
+      "$1" + newID + suffix + "$3",
+    );
+  });
+  body = body.replace(new RegExp(suffix, "g"), "");
+  return body;
+}
+
+const viewBox = "0 0 24 24";
+const content = replaceIDs(
+  `<defs><mask id="SVGnw0mAdjE"><path d="M12 2c5.52 0 10 4.48 10 10c0 5.52 -4.48 10 -10 10c-5.52 0 -10 -4.48 -10 -10c0 -5.52 4.48 -10 10 -10Z" class="n1mjuz"><animate fill="freeze" attributeName="d" dur="0.4s" values="M12 6c3.31 0 6 2.69 6 6c0 3.31 -2.69 6 -6 6c-3.31 0 -6 -2.69 -6 -6c0 -3.31 2.69 -6 6 -6Z;M12 2c5.52 0 10 4.48 10 10c0 5.52 -4.48 10 -10 10c-5.52 0 -10 -4.48 -10 -10c0 -5.52 4.48 -10 10 -10Z"/><set fill="freeze" attributeName="opacity" begin="0.4s" to="0"/></path><path d="M18 -4c5.52 0 10 4.48 10 10c0 5.52 -4.48 10 -10 10c-5.52 0 -10 -4.48 -10 -10c0 -5.52 4.48 -10 10 -10Z"><animate fill="freeze" attributeName="d" dur="0.4s" values="M22 -4c3.31 0 6 2.69 6 6c0 3.31 -2.69 6 -6 6c-3.31 0 -6 -2.69 -6 -6c0 -3.31 2.69 -6 6 -6Z;M18 -4c5.52 0 10 4.48 10 10c0 5.52 -4.48 10 -10 10c-5.52 0 -10 -4.48 -10 -10c0 -5.52 4.48 -10 10 -10Z"/><set fill="freeze" attributeName="opacity" begin="0.4s" to="0"/></path></mask></defs><path class="smogax"><animate fill="freeze" attributeName="opacity" dur="0.4s" values="1;0"/></path><g class="cuyn6t"><path mask="url(#SVGnw0mAdjE)" class="t_ev7s"/><path opacity="0" class="izfmla"><set fill="freeze" attributeName="opacity" begin="0.4s" to="1"/></path></g><g stroke-dashoffset="4" class="abf34n"><path class="k7_l3l"><animate attributeName="stroke-dashoffset" begin="0.4s" dur="6s" keyTimes="0;0.08;0.22;0.3;1" repeatCount="indefinite" values="4;0;0;4;4"/></path><path class="hhuniw"><animate attributeName="stroke-dashoffset" begin="1.07s" dur="6s" keyTimes="0;0.08;0.22;0.3;1" repeatCount="indefinite" values="4;0;0;4;4"/></path><path class="z8cgtd"><animate attributeName="stroke-dashoffset" begin="1.74s" dur="6s" keyTimes="0;0.08;0.22;0.3;1" repeatCount="indefinite" values="4;0;0;4;4"/></path><path class="drcfta"><animate attributeName="stroke-dashoffset" begin="2.41s" dur="6s" keyTimes="0;0.08;0.22;0.3;1" repeatCount="indefinite" values="4;0;0;4;4"/></path><path class="yij7vx"><animate attributeName="stroke-dashoffset" begin="3.08s" dur="6s" keyTimes="0;0.08;0.22;0.3;1" repeatCount="indefinite" values="4;0;0;4;4"/></path><path class="emoajy"><animate attributeName="stroke-dashoffset" begin="3.75s" dur="6s" keyTimes="0;0.08;0.22;0.3;1" repeatCount="indefinite" values="4;0;0;4;4"/></path><path class="f1to6s"><animate attributeName="stroke-dashoffset" begin="4.42s" dur="6s" keyTimes="0;0.08;0.22;0.3;1" repeatCount="indefinite" values="4;0;0;4;4"/></path><path class="niixso"><animate attributeName="stroke-dashoffset" begin="5.09s" dur="6s" keyTimes="0;0.08;0.22;0.3;1" repeatCount="indefinite" values="4;0;0;4;4"/></path><path class="z8cgtd"><animate attributeName="stroke-dashoffset" begin="5.76s" dur="6s" keyTimes="0;0.08;0.22;0.3;1" repeatCount="indefinite" values="4;0;0;4;4"/></path></g>`,
+);
+---
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="25px"
+  height="25px"
+  viewBox={viewBox}
+  {...props}
+  set:html={content}
+/>
+
+<style is:inline>
+  .n1mjuz {
+    fill: var(--svg-color--fff, #fff);
+  }
+  .smogax {
+    fill: none;
+    stroke: white;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: var(--svg-stroke-width--2px, 2px);
+    d: path(
+      "M12 21v1M21 12h1M12 3v-1M3 12h-1M18.5 18.5l0.5 0.5M18.5 5.5l0.5 -0.5M5.5 5.5l-0.5 -0.5M5.5 18.5l-0.5 0.5"
+    );
+  }
+  .t_ev7s {
+    d: path("M0 0h24v24H0z");
+  }
+  .izfmla {
+    stroke: white;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: var(--svg-stroke-width--2px, 2px);
+    d: path(
+      "M7 6c0 6.08 4.92 11 11 11c0.53 0 1.05 -0.04 1.56 -0.11c-1.61 2.47 -4.39 4.11 -7.56 4.11c-4.97 0 -9 -4.03 -9 -9c0 -3.17 1.64 -5.95 4.11 -7.56c-0.07 0.51 -0.11 1.03 -0.11 1.56Z"
+    );
+  }
+  .abf34n {
+    fill: none;
+    stroke: white;
+    stroke-dasharray: 4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .k7_l3l {
+    d: path("M12 5h1.5M12 5h-1.5M12 5v1.5M12 5v-1.5");
+  }
+  .hhuniw {
+    d: path("M17 11h1.5M17 11h-1.5M17 11v1.5M17 11v-1.5");
+  }
+
+  .z8cgtd {
+    d: path("M20 5h1.5M20 5h-1.5M20 5v1.5M20 5v-1.5");
+  }
+  .drcfta {
+    d: path("M12 4h1.5M12 4h-1.5M12 4v1.5M12 4v-1.5");
+  }
+  .yij7vx {
+    d: path("M18 12h1.5M18 12h-1.5M18 12v1.5M18 12v-1.5");
+  }
+  .emoajy {
+    d: path("M19 4h1.5M19 4h-1.5M19 4v1.5M19 4v-1.5");
+  }
+  .f1to6s {
+    d: path("M13 4h1.5M13 4h-1.5M13 4v1.5M13 4v-1.5");
+  }
+  .niixso {
+    d: path("M19 11h1.5M19 11h-1.5M19 11v1.5M19 11v-1.5");
+  }
+</style>

@@ -1,0 +1,108 @@
+---
+---
+<section class="features">
+  <article class="card">
+    <span class="card-icon">01</span>
+    <h2>Floating &amp; Fullscreen</h2>
+    <p>
+      Switch between a centered rounded header and a full-width edge-to-edge
+      layout with a single prop.
+    </p>
+  </article>
+  <article class="card">
+    <span class="card-icon">02</span>
+    <h2>Dark Mode Ready</h2>
+    <p>
+      Detects the <code>.dark</code> class on <code>&lt;html&gt;</code> automatically,
+      or force a theme with <code>preset</code>.
+    </p>
+  </article>
+  <article class="card">
+    <span class="card-icon">03</span>
+    <h2>3-Level Dropdowns</h2>
+    <p>
+      Supports top-level, secondary, and tertiary menu items — both on
+      desktop hover and mobile accordion.
+    </p>
+  </article>
+  <article class="card">
+    <span class="card-icon">04</span>
+    <h2>Zero External Icons</h2>
+    <p>
+      Arrow icons are inline SVG — no CDN script, no extra network request,
+      no flash of unstyled icons.
+    </p>
+  </article>
+  <article class="card">
+    <span class="card-icon">05</span>
+    <h2>Full TypeScript</h2>
+    <p>
+      All props and config objects are fully typed. Import types directly
+      for IntelliSense and compile-time safety.
+    </p>
+  </article>
+  <article class="card">
+    <span class="card-icon">06</span>
+    <h2>Slot Support</h2>
+    <p>
+      Add any content (buttons, search, badges) to the <code>actions</code> slot
+      — shown in both header and mobile panel.
+    </p>
+  </article>
+</section>
+
+<style>
+  .features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.25rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 1.5rem 5rem;
+  }
+
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    box-shadow: var(--shadow);
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 32px rgba(124, 58, 237, 0.13);
+  }
+
+  .card-icon {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--l-accent);
+    background: rgba(124, 58, 237, 0.1);
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    margin-bottom: 0.25rem;
+  }
+
+  .card h2 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .card p {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+</style>

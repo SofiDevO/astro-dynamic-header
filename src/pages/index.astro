@@ -1,44 +1,35 @@
 ---
-import Header from '../Header.astro'
+import Header from "../Header.astro";
+import Hero from "../components/Hero.astro";
+import Features from "../components/Features.astro";
+import Install from "../components/Install.astro";
+import Footer from "../components/Footer.astro";
+import SunIcon from "../SunIcon.astro";
+import MoonIcon from "../MoonIcon.astro";
+import type { MenuItem } from "../index.js";
 
-const menuItems = [
+const menuItems: MenuItem[] = [
   {
-    link: '#',
-    text: 'Services',
+    link: "#",
+    text: "Services",
     submenu: [
-      { link: '/design', text: 'Design' },
-      { link: '/consulting', text: 'Consulting' },
+      { link: "/design", text: "Design" },
+      { link: "/consulting", text: "Consulting" },
       {
-        link: '#',
-        text: 'Web Development',
+        link: "#",
+        text: "Web Development",
         submenu: [
-          { link: '/web/frontend', text: 'Frontend' },
-          { link: '/web/backend', text: 'Backend' },
-          { link: '/web/fullstack', text: 'Full Stack' },
+          { link: "/web/frontend", text: "Frontend" },
+          { link: "/web/backend", text: "Backend" },
+          { link: "/web/fullstack", text: "Full Stack" },
         ],
       },
     ],
   },
-  { link: '/about', text: 'About' },
-  { link: '/contact', text: 'Contact' },
-  {
-    link: '#',
-    text: 'Services',
-    submenu: [
-      { link: '/design', text: 'Design' },
-      { link: '/consulting', text: 'Consulting' },
-      {
-        link: '#',
-        text: 'Web Development',
-        submenu: [
-          { link: '/web/frontend', text: 'Frontend' },
-          { link: '/web/backend', text: 'Backend' },
-          { link: '/web/fullstack', text: 'Full Stack' },
-        ],
-      },
-    ],
-  },
-]
+  { link: "/about", text: "About" },
+  { link: "/blog", text: "Blog" },
+  { link: "/contact", text: "Contact" },
+];
 ---
 
 <!doctype html>
@@ -46,105 +37,209 @@ const menuItems = [
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script
-      src="https://cdn.jsdelivr.net/npm/iconify-icon@3.0.0/dist/iconify-icon.min.js"
-    ></script>
-    <title>My Astro Site with Dynamic Header</title>
+    <meta
+      name="description"
+      content="astro-dynamic-header — a zero-dependency responsive Astro header with multi-level dropdowns."
+    />
+    <title>astro-dynamic-header — Demo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
   </head>
+
   <body>
+    <!-- ── Header component ─────────────────────────────────────────── -->
     <Header
-      headerType="floating"
-      preset="dark"
-      navigation={{
-        homeUrl: '/',
-        menuItems: menuItems,
-        header__menu__class: 'custom-menu-wrapper',
-        header__item__class: 'custom-menu-item',
-        menu__link__class: 'custom-menu-link',
-      }}
+      headerType="fullscreen"
+      preset="auto"
+      navigation={{ homeUrl: "/", menuItems }}
       classNames={{
-        header: 'custom-header-wrapper',
-        container: 'custom-container',
-        mobileNav: 'custom-mobile-nav',
+        header: "backdrop-blur-xs shadow-xl bg-background/20",
+        mobileNav: "backdrop-blur-xs",
       }}
     >
-      <a
-        slot="logo"
-        href="/"
-        style="display: flex; align-items: center; gap: 10px; color: inherit; text-decoration: none;"
-      >
+      <a slot="logo" href="/" class="header-logo">
         <img
-          src="https://sofidev.blog/img/branding/logo.webp
-"
-          alt="My Site Logo"
+          src="https://itssofi.dev/img/icons/sofi-icon.webp"
+          alt="SofiDev Logo"
           width="44"
+          height="44"
         />
-        <span style="font-weight: bold; font-size: 1.2rem;">SofiDev</span>
+        <span>SofiDev</span>
       </a>
-      <button slot="actions">same btn</button>
+      <div slot="actions" class="header-actions">
+        <button
+          id="theme-toggle"
+          aria-label="Toggle dark mode"
+          title="Toggle dark mode"
+        >
+          <SunIcon class="sun-icon" />
+          <MoonIcon class="moon-icon" />
+        </button>
+        <a href="/login" class="btn-cta">Get started</a>
+      </div>
     </Header>
-    <main>
-      <h2>Hello World</h2>
-      <p>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod.
-      </p>
-    </main>
+
+    <!-- ── Isolated Sections ── -->
+    <Hero />
+    <Features />
+    <Install />
+    <Footer />
   </body>
 </html>
 
-<style is:inline>
-  :root {
-    /* Nueva personalización vía CSS Variables (sin necesidad de objeto JS) */
-    --l-accent: #ff0000;
-    --l-bg: rgba(255, 255, 255, 0.8);
+<script>
+  // Simple dark-mode toggle for the demo
+  const toggle = document.getElementById("theme-toggle");
+  const html = document.documentElement;
 
-    --d-accent: #00ffff;
-    --d-bg: rgba(20, 20, 20, 0.9);
+  // Restore saved preference
+  if (localStorage.getItem("theme") === "dark") {
+    html.classList.add("dark");
   }
 
-  * {
+  toggle?.addEventListener("click", () => {
+    const isDark = html.classList.toggle("dark");
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+  });
+</script>
+
+<style is:inline>
+  /* ── Reset & tokens ── */
+  *,
+  *::before,
+  *::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
   }
-  body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
+
+  :root {
+    --bg: #f8f7ff;
+    --bg-card: #ffffff;
+    --text: #1a1a2e;
+    --text-muted: #6b7280;
+    --border: rgba(0, 0, 0, 0.08);
+    --radius: 16px;
+    --shadow: 0 4px 24px rgba(124, 58, 237, 0.08);
+    font-family: "Inter", system-ui, sans-serif;
+
+    /* Native CSS Variables customization of the component */
+    --l-accent: #7c3aed;
+    --l-bg: rgba(255, 255, 255, 0.85);
+    --l-bg-opaque: #ffffff;
+    --l-text: #1a1a1a;
+
+    --d-accent: #a78bfa;
+    --d-bg: rgba(10, 10, 10, 0.85);
+    --d-bg-opaque: #0a0a0a;
+    --d-text: #f5f5f5;
   }
+
+  html,
+  body {
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    transition:
+      background 0.3s ease,
+      color 0.3s ease;
+  }
+
   a {
     color: inherit;
     text-decoration: none;
   }
-  ul {
-    margin: 0;
-    padding: 0;
-  }
-  ul li {
+  ul,
+  ol {
     list-style: none;
   }
-  .desktop {
-    display: block;
+  code {
+    font-family: "Fira Code", "Cascadia Code", monospace;
+    font-size: 0.88em;
+    background: rgba(124, 58, 237, 0.1);
+    color: var(--l-accent);
+    padding: 0.1em 0.4em;
+    border-radius: 4px;
   }
-  .mobile {
+
+  /* ── Header custom components styles ── */
+  .header-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: inherit;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.25rem;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  #theme-toggle {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 8px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+  }
+  #theme-toggle:hover {
+    transform: rotate(15deg) scale(1.15);
+  }
+  #theme-toggle svg {
+    stroke: var(--text);
+    transition: stroke 0.3s ease;
+  }
+
+  /* Sun/moon toggle display logic */
+  html.dark #theme-toggle .sun-icon {
     display: none;
   }
-  @media screen and (max-width: 767px) {
-    .desktop {
-      display: none;
-    }
-    .mobile {
-      display: block;
-      color: white;
-    }
+  html.dark #theme-toggle .moon-icon {
+    display: block;
   }
-  main {
-    margin-top: 40rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    height: 100vh;
+  html:not(.dark) #theme-toggle .sun-icon {
+    display: block;
+  }
+  html:not(.dark) #theme-toggle .moon-icon {
+    display: none;
+  }
+
+  .btn-cta {
+    background: var(--l-accent);
+    color: #fff;
+    padding: 0.45rem 1rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+  }
+  .btn-cta:hover {
+    opacity: 0.88;
+    transform: translateY(-1px);
+  }
+
+  /* Dark mode overrides for page */
+  .dark {
+    --bg: #080710;
+    --bg-card: #0d0c15;
+    --text: #f5f5fa;
+    --text-muted: #9ca3af;
+    --border: rgba(255, 255, 255, 0.06);
+    --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
   }
 </style>

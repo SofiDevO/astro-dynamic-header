@@ -155,6 +155,7 @@ const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
     <div class:list={["nav-menu-wrapper", classNames.nav]}>
       <NavMenu
         menuItems={menuItems}
+        homeUrl={homeUrl}
         header__menu__class={header__menu__class}
         header__item__class={header__item__class}
         menu__link__class={menu__link__class}
@@ -173,6 +174,7 @@ const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
 
     <MobileNav
       menuItems={menuItems}
+      homeUrl={homeUrl}
       type={headerType}
       mobileNav__class={classNames.mobileNav}
     >

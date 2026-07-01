@@ -1,0 +1,34 @@
+---
+const props = Astro.props;
+
+const viewBox = "0 0 24 24";
+const content = `<g class="gutruu"><path fill-opacity="0" class="xkoryc"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.4s" values="34;0"/><animate fill="freeze" attributeName="fill-opacity" begin="0.5s" dur="0.4s" to="1"/></path><g class="ft5dvn"><path d="M12 21v1M21 12h1M12 3v-1M3 12h-1" opacity="0"><animateTransform attributeName="transform" dur="30s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/><set fill="freeze" attributeName="opacity" begin="1s" to="1"/><animate fill="freeze" attributeName="d" begin="1s" dur="0.2s" values="M12 19v1M19 12h1M12 5v-1M5 12h-1;M12 21v1M21 12h1M12 3v-1M3 12h-1"/></path><path d="M18.5 18.5l0.5 0.5M18.5 5.5l0.5 -0.5M5.5 5.5l-0.5 -0.5M5.5 18.5l-0.5 0.5" opacity="0"><animateTransform attributeName="transform" dur="30s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/><set fill="freeze" attributeName="opacity" begin="1.2s" to="1"/><animate fill="freeze" attributeName="d" begin="1.2s" dur="0.2s" values="M17 17l0.5 0.5M17 7l0.5 -0.5M7 7l-0.5 -0.5M7 17l-0.5 0.5;M18.5 18.5l0.5 0.5M18.5 5.5l0.5 -0.5M5.5 5.5l-0.5 -0.5M5.5 18.5l-0.5 0.5"/></path></g></g>`;
+---
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="25px"
+  height="25px"
+  viewBox={viewBox}
+  {...props}
+  set:html={content}
+/>
+
+<style is:inline>
+  .gutruu {
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: var(--svg-stroke-width--2px, 2px);
+  }
+  .xkoryc {
+    fill: currentColor;
+    stroke-dasharray: 34;
+    d: path(
+      "M12 7c2.76 0 5 2.24 5 5c0 2.76 -2.24 5 -5 5c-2.76 0 -5 -2.24 -5 -5c0 -2.76 2.24 -5 5 -5Z"
+    );
+  }
+  .ft5dvn {
+    fill: none;
+  }
+</style>

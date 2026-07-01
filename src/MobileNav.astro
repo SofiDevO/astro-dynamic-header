@@ -1,5 +1,6 @@
 ---
 import type { MenuItem, SecondaryMenuItem, TertiaryMenuItem } from "./index.js";
+import ChevronIcon from "./ChevronIcon.astro";
 
 export interface Props {
   /** Header type for styling: "floating" or "fullscreen" */
@@ -10,6 +11,8 @@ export interface Props {
   showHomeLink?: boolean;
   /** Text for the home link (defaults to "Home") */
   homeText?: string;
+  /** The destination URL for the home link. @default "/" */
+  homeUrl?: string;
   /** Extra CSS class(es) for the root mobile `<nav>` panel. */
   mobileNav__class?: string;
 }
@@ -19,7 +22,8 @@ const {
   mobileNav__class,
   menuItems = [],
   showHomeLink = true,
-  homeText = "Home"
+  homeText = "Home",
+  homeUrl = "/",
 } = Astro.props;
 
 const pagePathname = Astro.url.pathname;
@@ -34,11 +38,11 @@ const pagePathname = Astro.url.pathname;
 >
   <ol class="mobile-menu">
     {
-      showHomeLink && pagePathname !== "/" && (
+      showHomeLink && pagePathname !== homeUrl && (
         <li class="header__item mobile-header__item">
           <a
             class="menu__link mobile-menu__link"
-            href="/"
+            href={homeUrl}
             data-astro-prefetch="hover"
           >
             {homeText}
@@ -58,13 +62,7 @@ const pagePathname = Astro.url.pathname;
               >
                 <summary class:list={["menu__summary", { active: isActive }]}>
                   {item.text}
-                  <iconify-icon
-                    class="iconify-arrow"
-                    icon="codicon:triangle-down"
-                    width="15"
-                    height="15"
-                    style="color: var(--accent-color);"
-                  />
+                  <ChevronIcon class="iconify-arrow" width={15} height={15} />
                 </summary>
                 <ol class="mobile-submenu">
                   {item?.submenu?.map((sub: SecondaryMenuItem) => {
@@ -85,12 +83,10 @@ const pagePathname = Astro.url.pathname;
                               ]}
                             >
                               {sub.text}
-                              <iconify-icon
+                              <ChevronIcon
                                 class="iconify-arrow"
-                                icon="codicon:triangle-down"
-                                width="15"
-                                height="15"
-                                style="color: var(--accent-color);"
+                                width={15}
+                                height={15}
                               />
                             </summary>
                             <ol class="mobile-subsubmenu">
@@ -240,7 +236,7 @@ const pagePathname = Astro.url.pathname;
     overflow: clip;
   }
 
-  .mobile-details:open iconify-icon {
+  .mobile-details:open svg.iconify-arrow {
     transform: rotate(180deg);
   }
 

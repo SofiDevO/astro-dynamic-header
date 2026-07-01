@@ -192,18 +192,25 @@ export interface HeaderProps {
 }
 
 export interface NavMenuProps {
-  menuItems?: MenuItemType[];
+  type?: "floating" | "fullscreen";
+  menuItems?: MenuItem[];
   showHomeLink?: boolean;
   homeText?: string;
+  header__menu__class?: string;
+  header__item__class?: string;
+  menu__link__class?: string;
 }
 
 export interface MobileNavProps {
-  menuItems?: MenuItemType[];
+  type?: "floating" | "fullscreen";
+  menuItems?: MenuItem[];
   showHomeLink?: boolean;
   homeText?: string;
+  mobileNav__class?: string;
   accentColor?: string;
 }
 
 export interface HamburgerButtonProps {
   color?: string;
 }
+

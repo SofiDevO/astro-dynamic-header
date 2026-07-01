@@ -1,5 +1,6 @@
 ---
 import type { MenuItem, SecondaryMenuItem, TertiaryMenuItem } from "./index.js";
+import ChevronIcon from "./ChevronIcon.astro";
 
 export interface Props {
   /**
@@ -19,6 +20,11 @@ export interface Props {
    * @default "Home"
    */
   homeText?: string;
+  /**
+   * The destination URL for the home link.
+   * @default "/"
+   */
+  homeUrl?: string;
   /** Extra CSS class(es) for the `<nav>` element. */
   header__menu__class?: string;
   /** Extra CSS class(es) for each top-level `<li>` item. */
@@ -31,6 +37,7 @@ const {
   menuItems = [],
   showHomeLink = true,
   homeText = "Home",
+  homeUrl = "/",
   header__menu__class,
   header__item__class,
   menu__link__class,
@@ -144,11 +151,11 @@ const pagePathname = Astro.url.pathname;
 <nav class:list={["header__menu", header__menu__class]} id="header-menu">
   <ul class="menu">
     {
-      showHomeLink && pagePathname !== "/" && (
+      showHomeLink && pagePathname !== homeUrl && (
         <li class:list={["header__item", header__item__class]}>
           <a
             class:list={["menu__link", menu__link__class]}
-            href="/"
+            href={homeUrl}
             data-astro-prefetch="hover"
           >
             {homeText}
@@ -162,12 +169,7 @@ const pagePathname = Astro.url.pathname;
           <a class:list={["menu__link", menu__link__class]} href={item.link}>
             {item.text}
             {item.submenu && (
-              <iconify-icon
-                class="iconify-arrow"
-                icon="codicon:triangle-down"
-                width="15"
-                height="15"
-              />
+              <ChevronIcon class="arrow-down" width={15} height={15} />
             )}
           </a>
           {item.submenu && (
@@ -177,11 +179,10 @@ const pagePathname = Astro.url.pathname;
                   <a href={sub.link}>
                     {sub.text}
                     {sub.submenu && sub.submenu.length > 0 && (
-                      <iconify-icon
-                        class="iconify-arrow"
-                        icon="codicon:triangle-down"
-                        width="15"
-                        height="15"
+                      <ChevronIcon
+                        class="ChevronIcon-arrow"
+                        width={15}
+                        height={15}
                       />
                     )}
                   </a>
@@ -255,11 +256,11 @@ const pagePathname = Astro.url.pathname;
     }
   }
 
-  .iconify-arrow {
+  .ChevronIcon-arrow {
     transition: transform 0.3s linear;
   }
 
-  .menu__link:hover > .iconify-arrow {
+  .menu__link:hover > .ChevronIcon-arrow {
     transform: rotate(180deg);
   }
 
@@ -325,11 +326,12 @@ const pagePathname = Astro.url.pathname;
   .submenu::after {
     content: "";
     position: absolute;
-    top: -4em;
+    top: -1.1em;
     width: 100%;
     z-index: -3;
     pointer-events: none;
-    height: 10em;
+    height: 7em;
+    right: 0;
   }
 
   .subsubmenu {

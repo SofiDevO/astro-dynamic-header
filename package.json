@@ -14,10 +14,13 @@
     "./NavMenu": "./src/NavMenu.astro",
     "./MobileNav": "./src/MobileNav.astro",
     "./HamburgerButton": "./src/HamburgerButton.astro",
+    "./ChevronIcon": "./src/ChevronIcon.astro",
+    "./defaults": "./src/defaults.ts",
     "./Header.astro": "./src/Header.astro",
     "./NavMenu.astro": "./src/NavMenu.astro",
     "./MobileNav.astro": "./src/MobileNav.astro",
-    "./HamburgerButton.astro": "./src/HamburgerButton.astro"
+    "./HamburgerButton.astro": "./src/HamburgerButton.astro",
+    "./ChevronIcon.astro": "./src/ChevronIcon.astro"
   },
   "files": [
     "src/*.ts",
@@ -50,13 +53,13 @@
   "author": "SofiDev contact@sofidev.top",
   "license": "MIT",
   "peerDependencies": {
-    "astro": "^6.0.6"
+    "astro": "^7.0.0"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
     "@types/jsdom": "^21.1.7",
     "@vitest/coverage-v8": "^3.2.4",
-    "astro": "^6.3.7",
+    "astro": "^7.0.4",
     "jsdom": "^26.1.0",
     "typescript": "^5.0.0",
     "vitest": "^3.2.4"

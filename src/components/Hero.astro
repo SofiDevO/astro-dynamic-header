@@ -1,0 +1,119 @@
+---
+---
+<section class="hero">
+  <span class="badge">Zero dependencies · Astro 7.x</span>
+  <h1>astro-dynamic-header</h1>
+  <p class="hero-sub">
+    A responsive, typed header component for Astro projects. Floating and
+    fullscreen layouts, multi-level dropdowns, dark-mode support — all with
+    inline SVG icons and no CDN required.
+  </p>
+  <div class="hero-actions">
+    <a
+      href="https://github.com/SofiDevO/astro-dynamic-header"
+      class="btn-primary"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      View on GitHub
+    </a>
+    <a
+      href="https://www.npmjs.com/package/@sofidevo/astro-dynamic-header"
+      class="btn-secondary"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      npm package
+    </a>
+  </div>
+</section>
+
+<style>
+  .hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 9rem 1.5rem 5rem;
+    gap: 1.5rem;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  .badge {
+    display: inline-block;
+    background: rgba(124, 58, 237, 0.12);
+    color: var(--l-accent);
+    border: 1px solid rgba(124, 58, 237, 0.25);
+    padding: 0.3rem 0.9rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.2rem, 6vw, 3.8rem);
+    font-weight: 700;
+    line-height: 1.1;
+    background: linear-gradient(135deg, var(--l-accent), var(--d-accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+    max-width: 600px;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 0.5rem;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    padding: 0.7rem 1.6rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .btn-primary {
+    background: var(--l-accent);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.45);
+  }
+
+  .btn-secondary {
+    border: 1.5px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text);
+  }
+
+  .btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+  }
+
+  @media (max-width: 480px) {
+    .hero {
+      padding-top: 7rem;
+    }
+  }
+</style>
