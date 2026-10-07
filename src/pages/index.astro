@@ -76,7 +76,15 @@ const menuItems: MenuItem[] = [
           <SunIcon class="sun-icon" />
           <MoonIcon class="moon-icon" />
         </button>
-        <a href="#" class="btn-cta">Get started</a>
+        <button
+          id="layout-toggle"
+          type="button"
+          title="Switch header layout"
+          aria-label="Switch to fullscreen layout"
+        >
+          <span id="layout-toggle-label">Floating</span>
+        </button>
+        <a href="https://www.npmjs.com/package/@sofidevo/astro-dynamic-header" target="_blank" class="btn-cta">Get started</a>
       </div>
     </Header>
 
@@ -105,6 +113,50 @@ const menuItems: MenuItem[] = [
   if (localStorage.getItem("theme") === "dark") {
     html.classList.add("dark");
   }
+
+  // ── Header layout toggle (demo only) ──────────────────────────────
+  // `headerType` is a server-rendered prop, so the demo swaps the
+  // component's layout modifiers at runtime instead of re-rendering.
+  const layoutTargets: Array<[selector: string, baseClass: string]> = [
+    [".header__container", "header__container"],
+    ["header.header", "header"],
+    ["#mobile-header-menu", "mobile-header__menu"],
+  ];
+
+  let layout: "floating" | "fullscreen" =
+    localStorage.getItem("layout") === "fullscreen" ? "fullscreen" : "floating";
+
+  function applyLayout(): void {
+    const suffix = `--${layout}`;
+    const label = layout === "floating" ? "Floating" : "Fullscreen";
+    const next = layout === "floating" ? "fullscreen" : "floating";
+
+    layoutTargets.forEach(([selector, baseClass]) => {
+      const element = document.querySelector(selector);
+      if (!element) return;
+      element.classList.remove(`${baseClass}--floating`, `${baseClass}--fullscreen`);
+      element.classList.add(`${baseClass}${suffix}`);
+    });
+
+    html.classList.toggle("layout-fullscreen", layout === "fullscreen");
+
+    document.querySelectorAll("#layout-toggle-label").forEach((node) => {
+      node.textContent = label;
+    });
+    document.querySelectorAll("#layout-toggle").forEach((node) => {
+      node.setAttribute("aria-label", `Switch to ${next} layout`);
+    });
+  }
+
+  applyLayout();
+
+  document.querySelectorAll("#layout-toggle").forEach((button) => {
+    button.addEventListener("click", () => {
+      layout = layout === "floating" ? "fullscreen" : "floating";
+      localStorage.setItem("layout", layout);
+      applyLayout();
+    });
+  });
 </script>
 
 <style is:inline>
@@ -227,6 +279,27 @@ const menuItems: MenuItem[] = [
     display: none;
   }
 
+  #layout-toggle {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: inherit;
+    cursor: pointer;
+    padding: 0.4rem 0.75rem;
+    border-radius: 999px;
+    font: inherit;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition:
+      border-color 0.2s ease,
+      color 0.2s ease;
+  }
+  #layout-toggle:hover {
+    border-color: var(--l-accent);
+    color: var(--l-accent);
+  }
+
   .btn-cta {
     background: var(--l-accent);
     color: #fff;
@@ -260,9 +333,18 @@ const menuItems: MenuItem[] = [
    */
   @layer utilities {
     .demo-pill {
-      border-radius: 999px;
-      backdrop-filter: blur(4px);
-      box-shadow: 0 8px 32px rgba(124, 58, 237, 0.35);
+      /* border-radius: 999px; */
+      /* backdrop-filter: blur(4px); */
+      box-shadow: 0 8px 32px rgba(148, 100, 231, 0.35);
+    }
+
+    /*
+     * In fullscreen the demo hands the squared look back to the component:
+     * .demo-pill (utilities) still beats .header--fullscreen (components),
+     * so the demo opts its own utility out explicitly.
+     */
+    html.layout-fullscreen .demo-pill {
+      border-radius: 0;
     }
   }
 </style>
