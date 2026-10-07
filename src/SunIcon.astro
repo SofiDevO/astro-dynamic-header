@@ -15,20 +15,28 @@ const content = `<g class="gutruu"><path fill-opacity="0" class="xkoryc"><animat
 />
 
 <style is:inline>
-  .gutruu {
-    stroke: currentColor;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    stroke-width: var(--svg-stroke-width--2px, 2px);
-  }
-  .xkoryc {
-    fill: currentColor;
-    stroke-dasharray: 34;
-    d: path(
-      "M12 7c2.76 0 5 2.24 5 5c0 2.76 -2.24 5 -5 5c-2.76 0 -5 -2.24 -5 -5c0 -2.76 2.24 -5 5 -5Z"
-    );
-  }
-  .ft5dvn {
-    fill: none;
+  /*
+   * base (resets) < components (ours) < utilities (consumer classNames).
+   * Order statement keeps it deterministic regardless of bundling order.
+   */
+  @layer theme, base, components, utilities;
+
+  @layer components {
+    .gutruu {
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: var(--svg-stroke-width--2px, 2px);
+    }
+    .xkoryc {
+      fill: currentColor;
+      stroke-dasharray: 34;
+      d: path(
+        "M12 7c2.76 0 5 2.24 5 5c0 2.76 -2.24 5 -5 5c-2.76 0 -5 -2.24 -5 -5c0 -2.76 2.24 -5 5 -5Z"
+      );
+    }
+    .ft5dvn {
+      fill: none;
+    }
   }
 </style>

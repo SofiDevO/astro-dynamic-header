@@ -10,32 +10,10 @@ import type {
 } from "./index.js";
 
 export interface Props {
-  /**
-   * Layout style.
-   * - "floating": Centered with max-width and rounded corners.
-   * - "fullscreen": Full width with no border radius.
-   * @default "floating"
-   */
   headerType?: "floating" | "fullscreen";
-  /**
-   * Theme behavior.
-   * - "light": Force light mode.
-   * - "dark": Force dark mode.
-   * - "auto": Detects .dark class on the root element.
-   * @default "auto"
-   */
   preset?: "light" | "dark" | "auto";
-
-  /** Navigation links and structure. */
   navigation?: NavConfig;
-  /** Custom theme overrides for light and dark modes. */
   theme?: DualThemeConfig;
-  /**
-   * High-level CSS class overrides for structural wrapper elements.
-   * For fine-grained nav/logo element classes, use the nested `xxx__class`
-   * props inside `navigation` or `logo` instead.
-   * @example { header: "shadow-lg", container: "top-4" }
-   */
   classNames?: HeaderClassNames;
 }
 
@@ -57,7 +35,7 @@ if (import.meta.env.DEV) {
   }
 }
 
-// Map user theme overrides to CSS custom properties
+
 const inlineStyles: Record<string, string> = {};
 
 if (theme.light) {
@@ -75,7 +53,7 @@ if (theme.dark) {
   if (theme.dark.backdropBlur) inlineStyles["--d-blur"] = theme.dark.backdropBlur;
 }
 
-const zIndex = theme.light?.zIndex ?? 10;
+const zIndex = theme.light?.zIndex ?? theme.dark?.zIndex ?? 10;
 
 // Navigation configuration
 const {
@@ -92,45 +70,9 @@ const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
 ---
 
 <script>
-  class HamburgerController {
-    private hamburgerBtn: HTMLElement | null;
-    private mobileMenu: HTMLElement | null;
-    private links: NodeListOf<HTMLElement>;
+  import { initHamburger } from "./scripts/hamburger.js";
 
-    constructor() {
-      this.hamburgerBtn = document.getElementById("hamburger-btn");
-      this.mobileMenu = document.getElementById("mobile-header-menu");
-      this.links = document.querySelectorAll(".mobile-menu__link");
-      this.init();
-    }
-
-    private init(): void {
-      if (this.hamburgerBtn && this.mobileMenu) {
-        this.hamburgerBtn.addEventListener("click", () => this.toggleMenu());
-        this.links.forEach((link) => {
-          link.addEventListener("click", () => this.closeMenu());
-        });
-      }
-    }
-
-    private closeMenu(): void {
-      if (this.hamburgerBtn && this.mobileMenu) {
-        this.hamburgerBtn.classList.remove("is-active");
-        this.mobileMenu.classList.remove("is-active");
-      }
-    }
-
-    private toggleMenu(): void {
-      if (this.hamburgerBtn && this.mobileMenu) {
-        this.hamburgerBtn.classList.toggle("is-active");
-        this.mobileMenu.classList.toggle("is-active");
-      }
-    }
-  }
-
-  document.addEventListener("DOMContentLoaded", () => {
-    new HamburgerController();
-  });
+  initHamburger();
 </script>
 
 <div
@@ -189,118 +131,123 @@ const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
   </header>
 </div>
 
-<style is:inline>
-  .header {
-    --bg-color: var(--l-bg, rgba(255, 255, 255, 0.9));
-    --bg-color-opaque: var(--l-bg-opaque, rgb(255, 255, 255));
-    --text-color: var(--l-text, #1a1a1a);
-    --accent-color: var(--l-accent, #3e1c71);
-    --backdrop-blur: var(--l-blur, blur(20px));
+<style>
+  /*
+   * Cascade layers keep this component overridable:
+   *   base (resets/preflight) < components (ours) < utilities (your classNames)
+   * The order statement below makes that order deterministic no matter how
+   * the consumer's CSS is bundled. No `!important` is needed to override us.
+   */
+  @layer theme, base, components, utilities;
 
-    display: flex;
-    align-items: center;
-    width: 100%;
-    justify-content: space-between;
-    padding: 1em 2em;
-    background-color: var(--bg-color);
-    backdrop-filter: var(--backdrop-blur);
-    -webkit-backdrop-filter: var(--backdrop-blur);
-    color: var(--text-color);
-    transition:
-      background-color 0.3s ease,
-      color 0.3s ease;
+  @layer components {
+    .header {
+      --bg-color: var(--l-bg, rgba(255, 255, 255, 0.9));
+      --bg-color-opaque: var(--l-bg-opaque, rgb(255, 255, 255));
+      --text-color: var(--l-text, #1a1a1a);
+      --accent-color: var(--l-accent, #3e1c71);
+      --backdrop-blur: var(--l-blur, blur(20px));
 
-    @media (width < 768px) {
-      align-self: flex-end;
-      padding: 0.4em;
+      display: flex;
+      align-items: center;
+      width: 100%;
+      justify-content: space-between;
+      padding: 1em 2em;
+      background-color: var(--bg-color);
+      backdrop-filter: var(--backdrop-blur);
+      -webkit-backdrop-filter: var(--backdrop-blur);
+      color: var(--text-color);
+      transition:
+        background-color 0.3s ease,
+        color 0.3s ease;
+
+      @media (width < 768px) {
+        align-self: flex-end;
+        padding: 0.4em;
+        margin: 0 auto;
+      }
+    }
+
+    /* Automatic dark mode detection via root class */
+    :root.dark .header:not(.header--force-light):not(.header--force-dark) {
+      --bg-color: var(--d-bg, #0d0d0dcc);
+      --bg-color-opaque: var(--d-bg-opaque, #0d0d0d);
+      --text-color: var(--d-text, #ffffff);
+      --accent-color: var(--d-accent, #00ffff);
+      --backdrop-blur: var(--d-blur, blur(20px));
+    }
+
+    /* Forced themes: higher specificity than .header, no !important needed */
+    .header.header--force-dark {
+      --bg-color: var(--d-bg, #0d0d0dcc);
+      --bg-color-opaque: var(--d-bg-opaque, #0d0d0d);
+      --text-color: var(--d-text, #ffffff);
+      --accent-color: var(--d-accent, #00ffff);
+      --backdrop-blur: var(--d-blur, blur(30px));
+    }
+
+    .header.header--force-light {
+      --bg-color: var(--l-bg, rgba(255, 255, 255, 0.9));
+      --bg-color-opaque: var(--l-bg-opaque, rgb(255, 255, 255));
+      --text-color: var(--l-text, #1a1a1a);
+      --accent-color: var(--l-accent, #3e1c71);
+      --backdrop-blur: var(--l-blur, blur(30px));
+    }
+
+    .header__container {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       margin: 0 auto;
+      position: fixed;
+
+      @media (width < 768px) {
+        justify-content: flex-end;
+        align-items: flex-end;
+      }
     }
-  }
 
-  /* Automatic dark mode detection via root class */
-  :root.dark .header:not(.header--force-light) {
-    --bg-color: var(--d-bg, #0d0d0dcc);
-    --bg-color-opaque: var(--d-bg-opaque, #0d0d0d);
-    --text-color: var(--d-text, #ffffff);
-    --accent-color: var(--d-accent, #00ffff);
-    --backdrop-blur: var(--d-blur, blur(20px));
-  }
-
-  /* Forced themes */
-  .header--force-dark {
-    --bg-color: var(--d-bg, #0d0d0dcc) !important;
-    --bg-color-opaque: var(--d-bg-opaque, #0d0d0d) !important;
-    --text-color: var(--d-text, #ffffff) !important;
-    --accent-color: var(--d-accent, #00ffff) !important;
-    --backdrop-blur: var(--d-blur, blur(20px)) !important;
-  }
-
-  .header--force-light {
-    --bg-color: var(--l-bg, rgba(255, 255, 255, 0.9)) !important;
-    --bg-color-opaque: var(--l-bg-opaque, rgb(255, 255, 255)) !important;
-    --text-color: var(--l-text, #1a1a1a) !important;
-    --accent-color: var(--l-accent, #3e1c71) !important;
-    --backdrop-blur: var(--l-blur, blur(20px)) !important;
-  }
-
-  .header__container {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 0 auto;
-    position: fixed;
-
-    @media (width < 768px) {
-      justify-content: flex-end;
-      align-items: flex-end;
+    .header__container--floating {
+      padding: 0.5em;
     }
-  }
 
-  .header__container--floating {
-    padding: 0.5em;
-  }
-
-  .header__container--fullscreen {
-    padding: 0;
-  }
-
-  .header--floating {
-    max-width: 1100px;
-    border-radius: 20px;
-    padding: 0.7em 1em;
-
-    @media (width < 768px) {
-      max-width: 95%;
+    .header__container--fullscreen {
+      padding: 0;
     }
-  }
 
-  .header--fullscreen {
-    border-radius: 0;
-    padding: 1em 2em;
+    .header--floating {
+      max-width: 1100px;
+      border-radius: 20px;
+      padding: 0.7em 1em;
 
-    @media (width < 768px) {
-      max-width: 100%;
-      padding: 0.8em 1em;
+      @media (width < 768px) {
+        max-width: 95%;
+      }
     }
-  }
 
+    .header--fullscreen {
+      border-radius: 0;
+      padding: 1em 2em;
 
-
-  .actions-desktop {
-    @media (width < 768px) {
-      display: none;
+      @media (width < 768px) {
+        max-width: 100%;
+        padding: 0.8em 1em;
+      }
     }
-  }
 
-  .actions-mobile {
-    margin-top: 20px;
-    @media (width >= 768px) {
-      display: none;
+    .actions-desktop {
+      @media (width < 768px) {
+        display: none;
+      }
     }
-  }
 
-  .header--fullscreen .mobile-header__menu.is-active {
-    transform: translate(0%);
+    .actions-mobile {
+      margin-top: 20px;
+
+      @media (width >= 768px) {
+        display: none;
+      }
+    }
   }
 </style>

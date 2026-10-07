@@ -129,8 +129,12 @@ export interface DualThemeConfig {
  * Custom CSS class names for high-level layout & appearance customization.
  *
  * These target the structural wrapper elements of the Header. For fine-grained
- * control over individual nav links or the logo internals, use the nested
- * `xxx__class` props inside the `navigation` or `logo` config objects instead.
+ * control over the nav items use the `xxx__class` props inside `navigation`,
+ * and style the logo directly on the markup you pass to the `logo` slot.
+ *
+ * The component styles live in `@layer components`, so any class passed here
+ * (Tailwind utilities included) wins over the built-in styles — no
+ * `!important` and no `twMerge()` required.
  *
  * @example
  * ```astro
@@ -142,10 +146,6 @@ export interface HeaderClassNames {
   container?: string;
   /** Inner `<header>` element — best place for shadows, borders, transitions. */
   header?: string;
-  /** Logo anchor `<a>` — add hover states or focus rings here. */
-  logo?: string;
-  /** Logo text `<span>` — override typography here. */
-  logoText?: string;
   /** Desktop nav wrapper `<div>` — adjust spacing between logo and menu. */
   nav?: string;
   /** Mobile nav panel `<nav>` — add slide-in overrides or z-index tweaks. */

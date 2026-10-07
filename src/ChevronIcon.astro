@@ -16,10 +16,18 @@ const content = `<path class="hlhawq"/>`;
 />
 
 <style is:inline>
-  .hlhawq {
-    fill: currentColor;
-    d: path(
-      "M11.646 15.146L5.854 9.354a.5.5 0 0 1 .353-.854h11.586a.5.5 0 0 1 .353.854l-5.793 5.792a.5.5 0 0 1-.707 0"
-    );
+  /*
+   * base (resets) < components (ours) < utilities (consumer classNames).
+   * Order statement keeps it deterministic regardless of bundling order.
+   */
+  @layer theme, base, components, utilities;
+
+  @layer components {
+    .hlhawq {
+      fill: currentColor;
+      d: path(
+        "M11.646 15.146L5.854 9.354a.5.5 0 0 1 .353-.854h11.586a.5.5 0 0 1 .353.854l-5.793 5.792a.5.5 0 0 1-.707 0"
+      );
+    }
   }
 </style>

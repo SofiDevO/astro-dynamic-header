@@ -3,33 +3,13 @@ import type { MenuItem, SecondaryMenuItem, TertiaryMenuItem } from "./index.js";
 import ChevronIcon from "./ChevronIcon.astro";
 
 export interface Props {
-  /**
-   * Header type for styling.
-   * @example "floating"
-   */
   type?: "floating" | "fullscreen";
-  /** Array of menu items to display. */
   menuItems?: MenuItem[];
-  /**
-   * Whether to show the home link in the menu.
-   * @default true
-   */
   showHomeLink?: boolean;
-  /**
-   * Text for the home link.
-   * @default "Home"
-   */
   homeText?: string;
-  /**
-   * The destination URL for the home link.
-   * @default "/"
-   */
   homeUrl?: string;
-  /** Extra CSS class(es) for the `<nav>` element. */
   header__menu__class?: string;
-  /** Extra CSS class(es) for each top-level `<li>` item. */
   header__item__class?: string;
-  /** Extra CSS class(es) for each top-level menu `<a>` link. */
   menu__link__class?: string;
 }
 
@@ -47,105 +27,9 @@ const pagePathname = Astro.url.pathname;
 ---
 
 <script>
-  function adjustSubsubmenuPositionOnResize() {
-    const subsubmenus = document.querySelectorAll(
-      ".subsubmenu",
-    ) as NodeListOf<HTMLElement>;
+  import { initNavMenu } from "./scripts/nav-menu.js";
 
-    subsubmenus.forEach((subsubmenu) => {
-      const rect = subsubmenu.getBoundingClientRect();
-      const viewportWidth = window.innerWidth;
-
-      if (rect.right > viewportWidth) {
-        subsubmenu.style.right = "100%";
-        subsubmenu.style.left = "0";
-      } else {
-        subsubmenu.style.left = "100%";
-        subsubmenu.style.right = "0";
-      }
-    });
-  }
-
-  function handleSubsubmenuInteraction() {
-    const parentItems = document.querySelectorAll(".submenu__item--secondary");
-
-    parentItems.forEach((parentItem) => {
-      const subsubmenu = parentItem.querySelector(".subsubmenu");
-
-      if (subsubmenu) {
-        const adjustPosition = () => {
-          const viewportWidth = window.innerWidth;
-
-          const originalDisplay = (subsubmenu as HTMLElement).style.display;
-          const originalVisibility = (subsubmenu as HTMLElement).style
-            .visibility;
-
-          (subsubmenu as HTMLElement).style.display = "block";
-          (subsubmenu as HTMLElement).style.visibility = "hidden";
-          (subsubmenu as HTMLElement).style.left = "100%";
-          (subsubmenu as HTMLElement).style.transform = "auto";
-
-          const rect = subsubmenu.getBoundingClientRect();
-
-          if (rect.right > viewportWidth) {
-            (subsubmenu as HTMLElement).style.left = "-100%";
-            (subsubmenu as HTMLElement).style.right = "auto";
-            const leftRect = subsubmenu.getBoundingClientRect();
-
-            if (leftRect.left < 0) {
-              (subsubmenu as HTMLElement).style.left = "100%";
-              const overflow = rect.right - viewportWidth + 30;
-              (subsubmenu as HTMLElement).style.transform =
-                `translateX(-${overflow}px)`;
-            }
-          }
-          (subsubmenu as HTMLElement).style.display = originalDisplay;
-          (subsubmenu as HTMLElement).style.visibility = originalVisibility;
-        };
-
-        const showSubsubmenu = () => {
-          adjustPosition();
-
-          (subsubmenu as HTMLElement).style.opacity = "1";
-          (subsubmenu as HTMLElement).style.pointerEvents = "all";
-
-          const isPositionedLeft =
-            (subsubmenu as HTMLElement).style.left === "-100%";
-          const transformDirection = isPositionedLeft ? "-32px" : "32px";
-
-          const currentTransform = (subsubmenu as HTMLElement).style.transform;
-          if (currentTransform && currentTransform.includes("translateX")) {
-            const existingTranslate = currentTransform.match(
-              /translateX\(([^)]+)\)/,
-            );
-            if (existingTranslate) {
-              const existingValue = existingTranslate[1];
-              (subsubmenu as HTMLElement).style.transform =
-                `translateX(calc(${existingValue} + ${transformDirection}))`;
-            }
-          } else {
-            (subsubmenu as HTMLElement).style.transform =
-              `${currentTransform} translateX(${transformDirection})`.trim();
-          }
-        };
-
-        const hideSubsubmenu = () => {
-          (subsubmenu as HTMLElement).style.opacity = "";
-          (subsubmenu as HTMLElement).style.pointerEvents = "";
-          (subsubmenu as HTMLElement).style.transform = "";
-        };
-
-        parentItem.addEventListener("mouseenter", showSubsubmenu);
-        parentItem.addEventListener("mouseleave", hideSubsubmenu);
-      }
-    });
-  }
-
-  window.addEventListener("resize", adjustSubsubmenuPositionOnResize);
-  document.addEventListener("DOMContentLoaded", () => {
-    adjustSubsubmenuPositionOnResize();
-    handleSubsubmenuInteraction();
-  });
+  initNavMenu();
 </script>
 
 <nav class:list={["header__menu", header__menu__class]} id="header-menu">
@@ -205,187 +89,195 @@ const pagePathname = Astro.url.pathname;
   </ul>
 </nav>
 
-<style is:inline>
-  .header__menu {
-    @media (width < 768px) {
-      display: none;
+<style>
+  /*
+   * base (resets) < components (ours) < utilities (consumer classNames).
+   * Order statement keeps it deterministic regardless of bundling order.
+   */
+  @layer theme, base, components, utilities;
+
+  @layer components {
+    .header__menu {
+      @media (width < 768px) {
+        display: none;
+      }
     }
-  }
 
-  .menu {
-    list-style: none;
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
+    .menu {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
 
-    @media (width < 768px) {
-      flex-direction: column;
+      @media (width < 768px) {
+        flex-direction: column;
+      }
     }
-  }
 
-  .menu__link {
-    text-decoration: none;
-    padding: 0.5em;
-    display: flex;
-    align-items: center;
-    gap: 0.8em;
-    color: color-mix(
-      in srgb,
-      var(--accent-color, #00ffff) 30%,
-      var(--text-color, #ffffff) 70%
-    );
-    position: relative;
-  }
+    .menu__link {
+      text-decoration: none;
+      padding: 0.5em;
+      display: flex;
+      align-items: center;
+      gap: 0.8em;
+      color: color-mix(
+        in srgb,
+        var(--accent-color, #00ffff) 30%,
+        var(--text-color, #ffffff) 70%
+      );
+      position: relative;
+    }
 
-  @media screen and (min-width: 768px) {
-    .menu__link::after {
+    @media screen and (min-width: 768px) {
+      .menu__link::after {
+        position: absolute;
+        top: 33px;
+        left: 0;
+        content: "";
+        width: 100%;
+        transform: scale(0);
+        transform-origin: 1;
+        height: 2px;
+        transition: transform 0.3s ease;
+        background: var(--accent-color, #00ffff);
+      }
+
+      .menu__link:hover::after {
+        transform: scale(1);
+      }
+    }
+
+    .ChevronIcon-arrow {
+      transition: transform 0.3s linear;
+    }
+
+    .menu__link:hover > .ChevronIcon-arrow {
+      transform: rotate(180deg);
+    }
+
+    .submenu,
+    .subsubmenu {
+      color: var(--text-color, #ffffff);
+      background-color: var(--bg-color-opaque, #171717);
+      border: 0.5px solid
+        color-mix(in srgb, var(--accent-color, #3e1c71) 30%, transparent);
       position: absolute;
-      top: 33px;
-      left: 0;
-      content: "";
+      flex-direction: column;
+      gap: 0.4em;
+      padding: 1em;
+      border-radius: 10px;
+      transition: transform 0.3s ease-in-out;
+      pointer-events: none;
+      opacity: 0;
+      text-wrap: nowrap;
+    }
+
+    .menu__item {
+      padding: 6px;
+      position: relative;
+      list-style: none;
+    }
+
+    .submenu a,
+    .subsubmenu a {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       width: 100%;
-      transform: scale(0);
-      transform-origin: 1;
-      height: 2px;
-      transition: transform 0.3s ease;
-      background: var(--accent-color, #00ffff);
+      height: 64px;
+      border-radius: 6px;
+      color: var(--text-color, #fff);
     }
 
-    .menu__link:hover::after {
-      transform: scale(1);
+    .submenu__item--secondary,
+    .submenu__item--tertiary {
+      position: relative;
     }
-  }
 
-  .ChevronIcon-arrow {
-    transition: transform 0.3s linear;
-  }
+    .submenu__item--secondary a,
+    .submenu__item--tertiary a {
+      padding: 26px;
+    }
 
-  .menu__link:hover > .ChevronIcon-arrow {
-    transform: rotate(180deg);
-  }
+    .submenu__item--secondary a:hover,
+    .submenu__item--tertiary a:hover {
+      background: color-mix(
+        in srgb,
+        var(--accent-color, #00ffff) 15%,
+        transparent
+      );
+      color: var(--text-color, white);
+    }
 
-  .submenu,
-  .subsubmenu {
-    color: var(--text-color, #ffffff);
-    background-color: var(--bg-color-opaque, #171717);
-    border: 0.5px solid
-      color-mix(in srgb, var(--accent-color, #3e1c71) 30%, transparent);
-    position: absolute;
-    flex-direction: column;
-    gap: 0.4em;
-    padding: 1em;
-    border-radius: 10px;
-    transition: transform 0.3s ease-in-out;
-    pointer-events: none;
-    opacity: 0;
-    text-wrap: nowrap;
-  }
+    .submenu {
+      padding: 0.9em;
+      right: calc(50% - 80px);
+    }
 
-  .menu__item {
-    padding: 6px;
-    position: relative;
-    list-style: none;
-  }
+    .submenu::after {
+      content: "";
+      position: absolute;
+      top: -1.1em;
+      width: 100%;
+      z-index: -3;
+      pointer-events: none;
+      height: 7em;
+      right: 0;
+    }
 
-  .submenu a,
-  .subsubmenu a {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    height: 64px;
-    border-radius: 6px;
-    color: var(--text-color, #fff);
-  }
+    .subsubmenu {
+      top: 0;
+      left: auto;
+      right: auto;
+      min-width: 193px;
+    }
 
-  .submenu__item--secondary,
-  .submenu__item--tertiary {
-    position: relative;
-  }
+    .subsubmenu::before {
+      content: "";
+      position: absolute;
+      top: -4em;
+      z-index: -1;
+      pointer-events: none;
+      height: 10em;
+      width: 20em;
+      height: 14em;
+    }
 
-  .submenu__item--secondary a,
-  .submenu__item--tertiary a {
-    padding: 26px;
-  }
+    .subsubmenu::after {
+      content: "";
+      position: absolute;
+      top: -14px;
+      right: 3em;
+      width: 100%;
+      z-index: -3;
+      height: 21em;
+    }
 
-  .submenu__item--secondary a:hover,
-  .submenu__item--tertiary a:hover {
-    background: color-mix(
-      in srgb,
-      var(--accent-color, #00ffff) 15%,
-      transparent
-    );
-    color: var(--text-color, white);
-  }
+    .submenu li {
+      width: 100%;
+    }
 
-  .submenu {
-    padding: 0.9em;
-    right: calc(50% - 80px);
-  }
+    .menu__item:hover > .submenu {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateY(1.4em);
+    }
 
-  .submenu::after {
-    content: "";
-    position: absolute;
-    top: -1.1em;
-    width: 100%;
-    z-index: -3;
-    pointer-events: none;
-    height: 7em;
-    right: 0;
-  }
+    .menu__item:hover > .submenu::after {
+      pointer-events: all;
+    }
 
-  .subsubmenu {
-    top: 0;
-    left: auto;
-    right: auto;
-    min-width: 193px;
-  }
+    .submenu li:hover > .subsubmenu {
+      opacity: 1;
+      pointer-events: all;
+    }
 
-  .subsubmenu::before {
-    content: "";
-    position: absolute;
-    top: -4em;
-    z-index: -1;
-    pointer-events: none;
-    height: 10em;
-    width: 20em;
-    height: 14em;
-  }
+    .submenu li:hover > .subsubmenu::before {
+      pointer-events: all;
+    }
 
-  .subsubmenu::after {
-    content: "";
-    position: absolute;
-    top: -14px;
-    right: 3em;
-    width: 100%;
-    z-index: -3;
-    height: 21em;
-  }
-
-  .submenu li {
-    width: 100%;
-  }
-
-  .menu__item:hover > .submenu {
-    opacity: 1;
-    pointer-events: all;
-    transform: translateY(1.4em);
-  }
-
-  .menu__item:hover > .submenu::after {
-    pointer-events: all;
-  }
-
-  .submenu li:hover > .subsubmenu {
-    opacity: 1;
-    pointer-events: all;
-  }
-
-  .submenu li:hover > .subsubmenu::before {
-    pointer-events: all;
-  }
-
-  .submenu li:hover > .subsubmenu::after {
-    pointer-events: all;
+    .submenu li:hover > .subsubmenu::after {
+      pointer-events: all;
+    }
   }
 </style>

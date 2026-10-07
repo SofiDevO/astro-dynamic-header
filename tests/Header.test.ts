@@ -1,136 +1,124 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { HamburgerController, initHamburger } from '../src/scripts/hamburger';
 
-// Mock del DOM para simular elementos HTML
-const mockHamburgerBtn = {
-  classList: {
-    toggle: vi.fn(),
-    remove: vi.fn(),
-    add: vi.fn(),
-    contains: vi.fn(),
-  },
-  addEventListener: vi.fn(),
-};
+const originalReadyState = document.readyState;
 
-const mockMobileMenu = {
-  classList: {
-    toggle: vi.fn(),
-    remove: vi.fn(),
-    add: vi.fn(),
-    contains: vi.fn(),
-  },
-};
+function mountHeaderDom() {
+  document.body.innerHTML = `
+    <button id="hamburger-btn" aria-label="Menu"></button>
+    <nav id="mobile-header-menu">
+      <a class="mobile-menu__link">One</a>
+      <a class="mobile-menu__link">Two</a>
+    </nav>`;
 
-const mockLinks = [
-  { addEventListener: vi.fn() },
-  { addEventListener: vi.fn() },
-];
+  return {
+    btn: document.getElementById('hamburger-btn') as HTMLButtonElement,
+    menu: document.getElementById('mobile-header-menu') as HTMLElement,
+    links: Array.from(
+      document.querySelectorAll<HTMLElement>('.mobile-menu__link'),
+    ),
+  };
+}
 
-// Mock de document
-Object.defineProperty(document, 'getElementById', {
-  writable: true,
-  value: vi.fn((id) => {
-    if (id === 'hamburger-btn') return mockHamburgerBtn;
-    if (id === 'mobile-header-menu') return mockMobileMenu;
-    return null;
-  }),
-});
+function setReadyState(state: DocumentReadyState): void {
+  Object.defineProperty(document, 'readyState', {
+    value: state,
+    configurable: true,
+    writable: true,
+  });
+}
 
-Object.defineProperty(document, 'querySelectorAll', {
-  writable: true,
-  value: vi.fn((selector) => {
-    if (selector === '.mobile-menu__link') return mockLinks;
-    return [];
-  }),
-});
-
-Object.defineProperty(document, 'addEventListener', {
-  writable: true,
-  value: vi.fn(),
-});
-
-describe('Header Component - HamburgerController', () => {
-  let HamburgerController: any;
-
+describe('hamburger: HamburgerController', () => {
   beforeEach(() => {
-    // Reset mocks
-    vi.clearAllMocks();
-
-    // Importar la clase HamburgerController del componente Header
-    // Como es un componente Astro, necesitamos simular su comportamiento
-    HamburgerController = class {
-      private hamburgerBtn: any;
-      private mobileMenu: any;
-      private links: any[];
-
-      constructor() {
-        this.hamburgerBtn = document.getElementById("hamburger-btn");
-        this.mobileMenu = document.getElementById("mobile-header-menu");
-        this.links = Array.from(document.querySelectorAll(".mobile-menu__link"));
-        this.init();
-      }
-
-      private init(): void {
-        if (this.hamburgerBtn && this.mobileMenu) {
-          this.hamburgerBtn.addEventListener("click", () => this.toggleMenu());
-          this.links.forEach(link => {
-            link.addEventListener("click", () => this.closeMenu());
-          });
-        }
-      }
-
-      private closeMenu(): void {
-        if (this.hamburgerBtn && this.mobileMenu) {
-          this.hamburgerBtn.classList.remove("is-active");
-          this.mobileMenu.classList.remove("is-active");
-        }
-      }
-
-      private toggleMenu(): void {
-        if (this.hamburgerBtn && this.mobileMenu) {
-          this.hamburgerBtn.classList.toggle("is-active");
-          this.mobileMenu.classList.toggle("is-active");
-        }
-      }
-    };
+    document.body.innerHTML = '';
   });
 
-  it('should initialize hamburger controller correctly', () => {
-    const controller = new HamburgerController();
-
-    expect(document.getElementById).toHaveBeenCalledWith("hamburger-btn");
-    expect(document.getElementById).toHaveBeenCalledWith("mobile-header-menu");
-    expect(document.querySelectorAll).toHaveBeenCalledWith(".mobile-menu__link");
+  afterEach(() => {
+    setReadyState(originalReadyState);
+    document.body.innerHTML = '';
+    vi.restoreAllMocks();
   });
 
-  it('should toggle menu when hamburger button is clicked', () => {
-    const controller = new HamburgerController();
+  it('toggles the active state on button and panel when clicked', () => {
+    const { btn, menu } = mountHeaderDom();
+    new HamburgerController(document);
 
-    // Simular click en el botón hamburguesa
-    const clickHandler = mockHamburgerBtn.addEventListener.mock.calls[0][1];
-    clickHandler();
+    btn.click();
+    expect(btn.classList.contains('is-active')).toBe(true);
+    expect(menu.classList.contains('is-active')).toBe(true);
 
-    expect(mockHamburgerBtn.classList.toggle).toHaveBeenCalledWith("is-active");
-    expect(mockMobileMenu.classList.toggle).toHaveBeenCalledWith("is-active");
+    btn.click();
+    expect(btn.classList.contains('is-active')).toBe(false);
+    expect(menu.classList.contains('is-active')).toBe(false);
   });
 
-  it('should close menu when a link is clicked', () => {
-    const controller = new HamburgerController();
+  it('closes the panel when any mobile link is clicked', () => {
+    const { btn, menu, links } = mountHeaderDom();
+    new HamburgerController(document);
 
-    // Simular click en un enlace del menú
-    const linkClickHandler = mockLinks[0].addEventListener.mock.calls[0][1];
-    linkClickHandler();
+    btn.click();
+    expect(menu.classList.contains('is-active')).toBe(true);
 
-    expect(mockHamburgerBtn.classList.remove).toHaveBeenCalledWith("is-active");
-    expect(mockMobileMenu.classList.remove).toHaveBeenCalledWith("is-active");
+    links[1].click();
+    expect(btn.classList.contains('is-active')).toBe(false);
+    expect(menu.classList.contains('is-active')).toBe(false);
   });
 
-  it('should handle missing DOM elements gracefully', () => {
-    // Mock para elementos no encontrados
-    (document.getElementById as any).mockReturnValue(null);
+  it('wires every mobile link, not just the first one', () => {
+    const { btn, menu, links } = mountHeaderDom();
+    const spies = links.map((link) => vi.spyOn(link, 'addEventListener'));
 
-    const controller = new HamburgerController();
+    new HamburgerController(document);
 
-    // No debería hacer nada si los elementos no existen
-    expect(mockHamburgerBtn.addEventListener).not.toHaveBeenCalled();
+    expect(spies[0]).toHaveBeenCalledWith('click', expect.any(Function));
+    expect(spies[1]).toHaveBeenCalledWith('click', expect.any(Function));
+    expect(btn).toBeTruthy();
+    expect(menu).toBeTruthy();
+  });
+
+  it('does not throw when the header elements are missing', () => {
+    expect(() => new HamburgerController(document)).not.toThrow();
+    expect(document.getElementById('hamburger-btn')).toBeNull();
+    expect(document.getElementById('mobile-header-menu')).toBeNull();
+  });
+});
+
+describe('hamburger: initHamburger', () => {
+  beforeEach(() => {
+    document.body.innerHTML = '';
+  });
+
+  afterEach(() => {
+    setReadyState(originalReadyState);
+    document.body.innerHTML = '';
+    vi.restoreAllMocks();
+  });
+
+  it('wires the hamburger immediately when the DOM is ready', () => {
+    setReadyState('complete');
+    const { btn } = mountHeaderDom();
+
+    const controller = initHamburger(document);
+
+    expect(controller).toBeInstanceOf(HamburgerController);
+    btn.click();
+    expect(btn.classList.contains('is-active')).toBe(true);
+  });
+
+  it('defers wiring until DOMContentLoaded while still loading', () => {
+    setReadyState('loading');
+    const { btn, menu } = mountHeaderDom();
+
+    const controller = initHamburger(document);
+    expect(controller).toBeNull();
+
+    btn.click();
+    expect(btn.classList.contains('is-active')).toBe(false);
+
+    document.dispatchEvent(new Event('DOMContentLoaded'));
+
+    btn.click();
+    expect(btn.classList.contains('is-active')).toBe(true);
+    expect(menu.classList.contains('is-active')).toBe(true);
   });
 });

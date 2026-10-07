@@ -53,13 +53,10 @@ const menuItems: MenuItem[] = [
   <body>
     <!-- ── Header component ─────────────────────────────────────────── -->
     <Header
-      headerType="fullscreen"
+      headerType="floating"
       preset="auto"
       navigation={{ homeUrl: "/", menuItems }}
-      classNames={{
-        header: "backdrop-blur-xs shadow-xl bg-background/20",
-        mobileNav: "backdrop-blur-xs",
-      }}
+      classNames={{ header: "demo-pill" }}
     >
       <a slot="logo" href="/" class="header-logo">
         <img
@@ -79,7 +76,7 @@ const menuItems: MenuItem[] = [
           <SunIcon class="sun-icon" />
           <MoonIcon class="moon-icon" />
         </button>
-        <a href="/login" class="btn-cta">Get started</a>
+        <a href="#" class="btn-cta">Get started</a>
       </div>
     </Header>
 
@@ -93,28 +90,49 @@ const menuItems: MenuItem[] = [
 
 <script>
   // Simple dark-mode toggle for the demo
-  const toggle = document.getElementById("theme-toggle");
+  const toggle = document.querySelectorAll("#theme-toggle");
+  toggle.forEach((element) => {
+    element.addEventListener("click", () => {
+      const html = document.documentElement;
+      const isDark = html.classList.toggle("dark");
+      localStorage.setItem("theme", isDark ? "dark" : "light");
+    });
+  });
+
   const html = document.documentElement;
 
   // Restore saved preference
   if (localStorage.getItem("theme") === "dark") {
     html.classList.add("dark");
   }
-
-  toggle?.addEventListener("click", () => {
-    const isDark = html.classList.toggle("dark");
-    localStorage.setItem("theme", isDark ? "dark" : "light");
-  });
 </script>
 
 <style is:inline>
-  /* ── Reset & tokens ── */
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+  /*
+   * Cascade layers mirror what a real consumer does (e.g. Tailwind):
+   *   base (resets) < components (the Header) < utilities (classNames)
+   */
+  @layer theme, base, components, utilities;
+
+  @layer base {
+    /* ── Reset & tokens ── */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    ul,
+    ol {
+      list-style: none;
+    }
   }
 
   :root {
@@ -129,7 +147,7 @@ const menuItems: MenuItem[] = [
 
     /* Native CSS Variables customization of the component */
     --l-accent: #7c3aed;
-    --l-bg: rgba(255, 255, 255, 0.85);
+    --l-bg: rgba(255, 255, 255, 0.753);
     --l-bg-opaque: #ffffff;
     --l-text: #1a1a1a;
 
@@ -149,14 +167,6 @@ const menuItems: MenuItem[] = [
       color 0.3s ease;
   }
 
-  a {
-    color: inherit;
-    text-decoration: none;
-  }
-  ul,
-  ol {
-    list-style: none;
-  }
   code {
     font-family: "Fira Code", "Cascadia Code", monospace;
     font-size: 0.88em;
@@ -241,5 +251,18 @@ const menuItems: MenuItem[] = [
     --text-muted: #9ca3af;
     --border: rgba(255, 255, 255, 0.06);
     --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  }
+
+  /*
+   * Proof of the fix: the Header's own CSS lives in `components`, this
+   * utility lives in `utilities`, so `.demo-pill` wins without `!important`.
+   * It is passed to the component via classNames={{ header: "demo-pill" }}.
+   */
+  @layer utilities {
+    .demo-pill {
+      border-radius: 999px;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 8px 32px rgba(124, 58, 237, 0.35);
+    }
   }
 </style>
