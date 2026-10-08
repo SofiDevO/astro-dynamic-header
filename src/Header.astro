@@ -78,12 +78,13 @@ export interface Props {
    * ```
    */
   classNames?: HeaderClassNames;
+  headerBg?: string;
+
 }
 
 const {
   headerType = "floating",
   preset = "auto",
-
   navigation = {},
   classNames = {},
 } = Astro.props;
@@ -142,15 +143,15 @@ const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
 >
   <header
     class:list={[
+      classNames.header,
       "header",
       `header--${headerType}`,
       forcedClass,
-      classNames.header,
     ]}
   >
     <slot name="logo" />
 
-    <div class:list={["nav-menu-wrapper", classNames.nav]}>
+    <div class:list={[classNames.nav, "nav-menu-wrapper"]}>
       <NavMenu
         menuItems={menuItems}
         homeUrl={homeUrl}
@@ -199,18 +200,16 @@ const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
 
   @layer components {
     .header {
-      --bg-color: var(--l-bg, rgba(255, 255, 255, 0.9));
-      --bg-color-opaque: var(--l-bg-opaque, rgb(255, 255, 255));
+      --bg-color: var(--l-bg);
+      --bg-color-opaque: var(--l-bg-opaque, rgba(255, 255, 255, 0.748));
       --text-color: var(--l-text, #1a1a1a);
       --accent-color: var(--l-accent, #3e1c71);
       --backdrop-blur: var(--l-blur, blur(20px));
-
       display: flex;
       align-items: center;
       width: 100%;
       justify-content: space-between;
       padding: 1em 2em;
-      background-color: var(--bg-color);
       backdrop-filter: var(--backdrop-blur);
       -webkit-backdrop-filter: var(--backdrop-blur);
       color: var(--text-color);
@@ -227,7 +226,7 @@ const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
 
     /* Automatic dark mode detection via root class */
     :root.dark .header:not(.header--force-light):not(.header--force-dark) {
-      --bg-color: var(--d-bg, #0d0d0dcc);
+      --bg-color: var(--d-bg, rgba(0, 0, 0, 0.823));
       --bg-color-opaque: var(--d-bg-opaque, #0d0d0d);
       --text-color: var(--d-text, #ffffff);
       --accent-color: var(--d-accent, #00ffff);
@@ -236,15 +235,15 @@ const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
 
     /* Forced themes: higher specificity than .header, no !important needed */
     .header.header--force-dark {
-      --bg-color: var(--d-bg, #0d0d0dcc);
-      --bg-color-opaque: var(--d-bg-opaque, #0d0d0d);
+      --bg-color: var(--d-bg, rgba(0, 0, 0, 0.823));
+      --bg-color-opaque: var(--d-bg-opaque, #000000d9);
       --text-color: var(--d-text, #ffffff);
       --accent-color: var(--d-accent, #00ffff);
       --backdrop-blur: var(--d-blur, blur(30px));
     }
 
     .header.header--force-light {
-      --bg-color: var(--l-bg, rgba(255, 255, 255, 0.9));
+      --bg-color: var(--l-bg,  rgba(255, 255, 255, 0.748));
       --bg-color-opaque: var(--l-bg-opaque, rgb(255, 255, 255));
       --text-color: var(--l-text, #1a1a1a);
       --accent-color: var(--l-accent, #3e1c71);
@@ -286,7 +285,7 @@ const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
 
     .header--fullscreen {
       border-radius: 0;
-      padding: 1em 2em;
+      padding: 1em 0.6rem;
 
       @media (width < 768px) {
         max-width: 100%;
