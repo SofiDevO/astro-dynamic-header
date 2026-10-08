@@ -139,6 +139,21 @@ describe('built CSS cascade layers', () => {
     expect(css).not.toMatch(/!\s*important/);
   });
 
+  it('controls the container z-index through a CSS variable', () => {
+    const match = css.match(/z-index:\s*var\(--header-z-index,\s*10\)/);
+    expect(match).not.toBeNull();
+
+    const components = layerRanges(css, 'components');
+    const positions = indicesOf(css, '.header__container[data-astro-cid-');
+    expect(positions.length).toBeGreaterThan(0);
+    positions.forEach((position) => {
+      expect(
+        isInsideLayer(components, position),
+        `.header__container at offset ${position} must live in @layer components`,
+      ).toBe(true);
+    });
+  });
+
   it('ships the consumer override utilities inside @layer utilities', () => {
     const utilities = layerRanges(css, 'utilities');
     const demoPositions = indicesOf(css, '.demo-pill');

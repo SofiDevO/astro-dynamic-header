@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll } from 'vitest';
+import { describe, it, expect, beforeAll, vi } from 'vitest';
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { JSDOM } from 'jsdom';
 import Header from '../src/Header.astro';
@@ -49,19 +49,20 @@ describe('Header (Container API)', () => {
     ).toBe(true);
   });
 
-  it('defaults to the floating layout and z-index 10', async () => {
+  it('defaults to the floating layout and renders no inline styles', async () => {
     const { doc } = await render();
 
     const header = doc.querySelector('header.header')!;
     expect(header.classList.contains('header--floating')).toBe(true);
     expect(header.classList.contains('header--force-dark')).toBe(false);
     expect(header.classList.contains('header--force-light')).toBe(false);
+    expect(header.getAttribute('style')).toBeNull();
 
     const containerEl = doc.querySelector('.header__container')!;
     expect(containerEl.classList.contains('header__container--floating')).toBe(
       true,
     );
-    expect(containerEl.getAttribute('style')).toContain('z-index:10');
+    expect(containerEl.getAttribute('style')).toBeNull();
   });
 
   it('renders the fullscreen variant without the floating classes', async () => {
@@ -91,7 +92,9 @@ describe('Header (Container API)', () => {
     expect(light.classList.contains('header--force-dark')).toBe(false);
   });
 
-  it('injects theme variables and a custom z-index', async () => {
+  it('warns in dev and ignores the removed theme prop (v5 migration)', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
     const { doc } = await render({
       theme: {
         light: { backgroundColor: '#123456', zIndex: 42 },
@@ -99,12 +102,15 @@ describe('Header (Container API)', () => {
       },
     });
 
-    const headerStyle = doc.querySelector('header.header')!.getAttribute('style')!;
-    expect(headerStyle).toMatch(/--l-bg:\s*#123456/);
-    expect(headerStyle).toMatch(/--d-bg:\s*#000000/);
+    const warnings = warn.mock.calls.flat().join('\n');
+    expect(warnings).toContain("'theme' prop was removed in v5");
+    expect(warnings).toContain('--header-z-index');
+    warn.mockRestore();
+
+    expect(doc.querySelector('header.header')!.getAttribute('style')).toBeNull();
     expect(
       doc.querySelector('.header__container')!.getAttribute('style'),
-    ).toContain('z-index:42');
+    ).toBeNull();
   });
 
   it('renders navigation items with their fine-grained classes', async () => {

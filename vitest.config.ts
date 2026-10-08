@@ -34,7 +34,11 @@ export default defineConfig(async (env) => {
           test: {
             name: 'dom',
             environment: 'jsdom',
-            include: ['tests/Header.test.ts', 'tests/NavMenu.test.ts'],
+            include: [
+              'tests/Header.test.ts',
+              'tests/NavMenu.test.ts',
+              'tests/layer-diagnostics.test.ts',
+            ],
           },
         },
         {

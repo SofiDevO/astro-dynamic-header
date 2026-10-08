@@ -3,17 +3,80 @@ import HamburgerButton from "./HamburgerButton.astro";
 import NavMenu from "./NavMenu.astro";
 import MobileNav from "./MobileNav.astro";
 
-import type {
-  NavConfig,
-  DualThemeConfig,
-  HeaderClassNames,
-} from "./index.js";
+import type { NavConfig, HeaderClassNames } from "./index.js";
 
 export interface Props {
+  /**
+   * Layout style of the header.
+   * - `"floating"` — centered, max width, rounded corners (default).
+   * - `"fullscreen"` — full width, no border radius.
+   *
+   * @default "floating"
+   * @example
+   * ```astro
+   * <Header headerType="fullscreen" />
+   * ```
+   */
   headerType?: "floating" | "fullscreen";
+
+  /**
+   * Theme behavior of the header.
+   * - `"auto"` (default) — follows the `.dark` class on the root element.
+   * - `"light"` — always render the light theme (`header--force-light`).
+   * - `"dark"` — always render the dark theme (`header--force-dark`).
+   *
+   * Colors are controlled with CSS variables (see the README "CSS variable
+   * reference"), never with props.
+   *
+   * @default "auto"
+   * @example
+   * ```astro
+   * <Header preset="dark" />
+   * ```
+   */
   preset?: "light" | "dark" | "auto";
+
+  /**
+   * Navigation links, home link, and fine-grained classes for the desktop
+   * menu items.
+   *
+   * @example
+   * ```astro
+   * <Header
+   *   navigation={{
+   *     menuItems: [
+   *       { link: "/about", text: "About" },
+   *       { link: "/work", text: "Work", submenu: [{ link: "/ux", text: "UX" }] },
+   *     ],
+   *     menu__link__class: "hover:text-purple-400",
+   *   }}
+   * />
+   * ```
+   */
   navigation?: NavConfig;
-  theme?: DualThemeConfig;
+
+  /**
+   * CSS classes for the structural wrapper elements. The component styles
+   * live in `@layer components`, so any class passed here — Tailwind
+   * utilities included — wins over the built-in styles without `!important`.
+   *
+   * @example
+   * ```astro
+   * <Header classNames={{ header: "bg-red-500 shadow-xl", container: "top-4" }} />
+   * ```
+   *
+   * With plain CSS, put your own class in `@layer utilities` so it beats the
+   * component:
+   *
+   * ```astro
+   * <Header classNames={{ header: "custom-header-bg" }} />
+   * <style is:inline>
+   *   @layer utilities {
+   *     .custom-header-bg { background-color: red; }
+   *   }
+   * </style>
+   * ```
+   */
   classNames?: HeaderClassNames;
 }
 
@@ -22,11 +85,17 @@ const {
   preset = "auto",
 
   navigation = {},
-  theme = {},
   classNames = {},
 } = Astro.props;
 
 if (import.meta.env.DEV) {
+  const removedThemeProp = (Astro.props as Record<string, unknown>).theme;
+
+  if (removedThemeProp !== undefined) {
+    console.warn(
+      "[@sofidevo/astro-dynamic-header] BREAKING CHANGE: The 'theme' prop was removed in v5. Set the same tokens as CSS variables instead: --l-bg / --d-bg, --l-bg-opaque / --d-bg-opaque, --l-text / --d-text, --l-accent / --d-accent, --l-blur / --d-blur, and --header-z-index for the container z-index. See the README 'CSS variable reference'.",
+    );
+  }
 
   if (Array.isArray(navigation)) {
     console.warn(
@@ -34,26 +103,6 @@ if (import.meta.env.DEV) {
     );
   }
 }
-
-
-const inlineStyles: Record<string, string> = {};
-
-if (theme.light) {
-  if (theme.light.backgroundColor) inlineStyles["--l-bg"] = theme.light.backgroundColor;
-  if (theme.light.backgroundColorOpaque) inlineStyles["--l-bg-opaque"] = theme.light.backgroundColorOpaque;
-  if (theme.light.textColor) inlineStyles["--l-text"] = theme.light.textColor;
-  if (theme.light.accentColor) inlineStyles["--l-accent"] = theme.light.accentColor;
-  if (theme.light.backdropBlur) inlineStyles["--l-blur"] = theme.light.backdropBlur;
-}
-if (theme.dark) {
-  if (theme.dark.backgroundColor) inlineStyles["--d-bg"] = theme.dark.backgroundColor;
-  if (theme.dark.backgroundColorOpaque) inlineStyles["--d-bg-opaque"] = theme.dark.backgroundColorOpaque;
-  if (theme.dark.textColor) inlineStyles["--d-text"] = theme.dark.textColor;
-  if (theme.dark.accentColor) inlineStyles["--d-accent"] = theme.dark.accentColor;
-  if (theme.dark.backdropBlur) inlineStyles["--d-blur"] = theme.dark.backdropBlur;
-}
-
-const zIndex = theme.light?.zIndex ?? theme.dark?.zIndex ?? 10;
 
 // Navigation configuration
 const {
@@ -69,10 +118,19 @@ const {
 const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
 ---
 
+<style is:inline>
+  @layer theme, base, components, utilities;
+</style>
+
 <script>
   import { initHamburger } from "./scripts/hamburger.js";
+  import { initLayerDiagnostics } from "./scripts/layer-diagnostics.js";
 
   initHamburger();
+
+  if (import.meta.env.DEV) {
+    initLayerDiagnostics();
+  }
 </script>
 
 <div
@@ -81,7 +139,6 @@ const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
     `header__container--${headerType}`,
     classNames.container,
   ]}
-  style={{ zIndex }}
 >
   <header
     class:list={[
@@ -90,7 +147,6 @@ const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
       forcedClass,
       classNames.header,
     ]}
-    style={Object.keys(inlineStyles).length > 0 ? inlineStyles : undefined}
   >
     <slot name="logo" />
 
@@ -135,8 +191,9 @@ const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
   /*
    * Cascade layers keep this component overridable:
    *   base (resets/preflight) < components (ours) < utilities (your classNames)
-   * The order statement below makes that order deterministic no matter how
-   * the consumer's CSS is bundled. No `!important` is needed to override us.
+   * The order statement below fixes that order before any layer of ours is
+   * used; the dev-only diagnostic warns when a consumer's CSS created the
+   * layers in a different order first. No `!important` is needed to override us.
    */
   @layer theme, base, components, utilities;
 
@@ -201,6 +258,7 @@ const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
       align-items: center;
       margin: 0 auto;
       position: fixed;
+      z-index: var(--header-z-index, 10);
 
       @media (width < 768px) {
         justify-content: flex-end;

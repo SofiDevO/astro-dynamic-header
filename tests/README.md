@@ -17,6 +17,9 @@ Exercises the vanilla behaviour scripts that the components import:
   elements, `DOMContentLoaded` deferral).
 - `tests/NavMenu.test.ts` → `src/scripts/nav-menu.ts` (subsubmenu positioning,
   hover show/hide, resize repositioning, `DOMContentLoaded` deferral).
+- `tests/layer-diagnostics.test.ts` → `src/scripts/layer-diagnostics.ts`
+  (layer creation order from statements/blocks/`@media`, wrong-order and
+  missing-layer detection, fix messages).
 
 These tests mount real DOM and dispatch real events — they import the shipped
 modules instead of re-implementing their logic.
@@ -25,13 +28,14 @@ modules instead of re-implementing their logic.
 
 - `tests/render.test.ts` → renders `src/Header.astro` with Astro's Container
   API (`astro/container`) and asserts the markup: `classNames` plumbing,
-  layout variants, force-theme classes, theme variables/z-index, navigation
-  items and fine-grained `xxx__class` overrides.
+  layout variants, force-theme classes, absence of inline styles, the v5
+  `theme`-prop migration warning, navigation items and fine-grained
+  `xxx__class` overrides.
 - `tests/css-layers.test.ts` → runs a real `astro build` and asserts the
   published CSS contract: layer order statement, library rules inside
   `@layer components`, consumer `.demo-pill` override inside
-  `@layer utilities`, zero `!important`, and the `classNames` value present in
-  the built markup.
+  `@layer utilities`, zero `!important`, the `--header-z-index` CSS variable
+  on the container, and the `classNames` value present in the built markup.
 
 ## Notes
 

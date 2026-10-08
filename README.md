@@ -2,7 +2,7 @@
 
 A dynamic, responsive header component for Astro projects. Supports floating and fullscreen layouts, multi-level dropdown navigation, native CSS variable customization, dark mode, and TypeScript — all with zero external icon dependencies.
 
-As of v4.0.0 the component styles are shipped inside CSS cascade layers, so any utility class you pass to the component wins over the built-in styles **without `!important`**.
+As of v4.0.0 the component styles are shipped inside CSS cascade layers, so any utility class you pass to the component wins over the built-in styles **without `!important`**. As of v5.0.0 theming is CSS-variables-only (`--l-*`, `--d-*`, `--header-z-index`): the `theme` prop was removed and the component renders no inline styles.
 
 ## Features
 
@@ -12,9 +12,10 @@ As of v4.0.0 the component styles are shipped inside CSS cascade layers, so any 
 - **Dark Mode Ready** — auto-detects `.dark` on `<html>`, or forces a state with `preset`.
 - **Inline SVG Icons** — no external CDNs, no extra network requests, no flash of missing icons.
 - **Slot Support** — inject your custom logo and header actions directly into slots.
-- **Pure CSS Customization** — customize background, blur, and colors using native CSS variables.
+- **Pure CSS Customization** — background, blur, colors, and z-index via native CSS variables.
 - **Cascade-layer friendly** — component styles live in `@layer components`, so your utility classes override them without `!important` and without `twMerge()`.
-- **Full TypeScript** — all props and config interfaces are fully typed.
+- **Dev diagnostics** — in dev, warns in the console (with the fix) when your overrides cannot win or an old v3.x install is detected.
+- **Full TypeScript** — all props and config interfaces are fully typed and documented (TSDoc).
 
 ### Live Demo
 
@@ -62,6 +63,64 @@ const navigation = { menuItems };
 
 ---
 
+## Breaking Changes in v5.0.0
+
+> [!WARNING]
+> v5.0.0 removes the JavaScript theming API. The component now has a single theming mechanism: CSS variables.
+
+### 1. The `theme` prop and `defaultThemes` were removed
+
+Colors, blur, and z-index are plain CSS variables — one mechanism instead of two, and no inline styles at all, so layered CSS and utilities can always win.
+
+Before (v4):
+
+```astro
+---
+import { defaultThemes } from '@sofidevo/astro-dynamic-header';
+
+const theme = { light: { ...defaultThemes.light, accentColor: "#7c3aed", zIndex: 60 } };
+---
+<Header theme={theme} />
+```
+
+After (v5):
+
+```css
+:root {
+  --l-accent: #7c3aed;
+  --header-z-index: 60;
+}
+```
+
+In dev, the component logs a migration warning when it detects the removed prop. The `DualThemeConfig` and `ThemeConfig` types and the `./defaults` export are gone; passing `theme` now fails type-checking.
+
+### 2. The container no longer renders an inline z-index
+
+| | v4.x | v5.0.0 |
+| --- | --- | --- |
+| Theming API | `theme` prop + CSS variables | CSS variables only |
+| Container z-index | inline `style="z-index: 10"` (no CSS could beat it) | `z-index: var(--header-z-index, 10)` in `@layer components` (utilities win) |
+| `defaultThemes` | exported from `./defaults` | removed |
+
+z-index utilities passed as `classNames.container` (for example `"z-50"`) now work as expected.
+
+### 3. Other changes in v5.0.0
+
+- **Dev diagnostics for override problems.** In dev the component checks the final cascade layer order after page load and logs a `console.warn` with the exact fix when your overrides cannot win (wrong layer order) or when an old v3.x install is detected. The check is stripped from production builds.
+- **The layer order statement also ships inline.** Next to the bundled statement, the component renders `<style is:inline>` with `@layer theme, base, components, utilities;`, so styles injected at runtime are ordered correctly too.
+- **TSDoc everywhere.** Every prop and exported interface is documented in English with usage examples, including hover states via `classNames` and `navigation.menu__link__class`.
+
+### Migration checklist (to v5)
+
+```md
+- [ ] Update the package: npm i -U @sofidevo/astro-dynamic-header
+- [ ] Replace every `theme={{ light: {...}, dark: {...} }}` with the matching CSS variables (see "CSS variable reference").
+- [ ] Replace `theme.zIndex` with `--header-z-index` (or pass a z-index utility via `classNames.container`).
+- [ ] Remove `defaultThemes` imports; the defaults live in the CSS variable table below.
+```
+
+---
+
 ## Breaking Changes in v4.0.0
 
 > [!WARNING]
@@ -104,11 +163,10 @@ Two practical consequences:
 
 ### 3. Other behavior changes
 
-- **`theme.dark.zIndex` is now honored.** The container z-index resolves as `theme.light.zIndex ?? theme.dark.zIndex ?? 10`; previously only `light.zIndex` was read.
 - **Forced theme rules no longer use `!important`.** `.header.header--force-light` / `.header.header--force-dark` rely on specificity instead, so they can be overridden by your own layered CSS if you ever need to.
 - **The mobile panel's `.active` rule no longer uses `!important`**, so active-link styles are overridable like everything else.
 - **`MobileNav` defaults to `type="floating"`** when rendered on its own (previously it produced an undefined modifier class).
-- **Theme variable fallbacks now match `defaultThemes`** exactly (for example `rgba(255, 255, 255, 0.9)` for `--l-bg`).
+- **Theme variable fallbacks now match the documented defaults** exactly (for example `rgba(255, 255, 255, 0.9)` for `--l-bg`, see [CSS variable reference](#css-variable-reference)).
 
 ### Migration checklist
 
@@ -118,7 +176,6 @@ Two practical consequences:
 - [ ] Remove the `!important` declarations you added to override the header (they are no longer needed).
 - [ ] Move your global resets / element selectors into `@layer base`.
 - [ ] Using Tailwind v3? Read "Preflight changed my nav link colors" in the FAQ.
-- [ ] Setting only `dark.zIndex`? It now takes effect — double-check stacking.
 ```
 
 ---
@@ -132,8 +189,10 @@ Two practical consequences:
 | `headerType` | `"floating" \| "fullscreen"`  | `"floating"` | Layout style                                      |
 | `preset`     | `"light" \| "dark" \| "auto"` | `"auto"`     | Theme mode. `"auto"` follows `.dark` on `<html>`. |
 | `navigation` | `NavConfig`                   | `{}`         | Menu items, home link, and custom CSS classes     |
-| `theme`      | `DualThemeConfig`             | `{}`         | Optional theme overrides (prefer CSS variables)   |
 | `classNames` | `HeaderClassNames`            | `{}`         | Inject CSS classes into structural elements       |
+
+> [!NOTE]
+> There is no `theme` prop — it was removed in v5. Colors, blur, and z-index are CSS variables (see [CSS variable reference](#css-variable-reference)).
 
 ---
 
@@ -233,7 +292,7 @@ Everything below assumes you want to change how the header looks or behaves. Pic
 | A different overall design (square, full-width, compact) | Your own CSS in `@layer utilities` |
 | Restyle nav links, dropdowns, or the mobile panel | Selectors targeting the internal class hooks |
 | Brand colors, blur, background | CSS variables (`--l-*` / `--d-*`) |
-| Per-instance tokens or z-index | `theme` prop |
+| Per-instance tokens or z-index | Scoped CSS variables (`--header-z-index`, `--l-*` on a wrapper) |
 | Logo / buttons markup | Slots |
 
 ### Style precedence
@@ -417,25 +476,36 @@ Scoped to one section (marketing page gets a purple tint, the docs stay neutral)
 
 Variables are inherited, so defining them on any ancestor of the header works.
 
-### Example: z-index and per-instance tokens with the `theme` prop
+### Example: z-index and per-instance tokens
 
-The container renders an **inline** `style="z-index: N"`, and inline styles beat any non-`!important` declaration — so `classNames.container="z-50"` (or any z-index utility) will not win. Use the prop:
+The container resolves its stacking level as `z-index: var(--header-z-index, 10)` inside `@layer components`, and there is no inline style — so z-index utilities passed as `classNames.container` win:
 
 ```astro
----
-import { defaultThemes } from '@sofidevo/astro-dynamic-header';
-
-const theme = {
-  light: { ...defaultThemes.light, zIndex: 60 },
-  dark: { ...defaultThemes.dark, zIndex: 60 },
-};
----
-
-<Header theme={theme} classNames={{ header: "shadow-2xl" }} />
+<Header classNames={{ container: "z-50" }} />
 ```
 
-> [!NOTE]
-> `zIndex` resolves as `theme.light.zIndex ?? theme.dark.zIndex ?? 10`, so setting it in either block is enough. The value is a single inline number; it does not change between light and dark mode.
+Or set it once, globally or on a wrapper (variables are inherited):
+
+```css
+:root {
+  --header-z-index: 60;
+}
+```
+
+Per-instance tokens work the same way:
+
+```astro
+<section class="marketing-hero">
+  <Header navigation={{ menuItems }} />
+</section>
+```
+
+```css
+.marketing-hero {
+  --l-bg: rgb(124 58 237 / 0.14);
+  --header-z-index: 60;
+}
+```
 
 ### Example: mobile panel
 
@@ -508,7 +578,8 @@ The sun and chevron icons use `currentColor`, so they follow the surrounding tex
 
 ### Styling caveats
 
-- **z-index is inline.** Use `theme.zIndex`, not a utility class, on `container`.
+- **Layer order is fixed by first appearance.** If your plain-CSS overrides lose even from `@layer utilities`, put `@layer theme, base, components, utilities;` at the very top of your global stylesheet — the dev console warning points it out.
+- **There are no inline styles.** The container z-index is `var(--header-z-index, 10)` in `@layer components`, so utilities beat it.
 - **`!important` in a layer still works** (important declarations reverse layer order), but you should not need it.
 - **Unlayered CSS beats everything layered.** If a global rule seems "too strong", that is why — move it into `@layer base`.
 - **Astro scopes component styles with `data-astro-cid-*` attributes.** Your selectors do not need them; plain class selectors work.
@@ -517,11 +588,11 @@ The sun and chevron icons use `currentColor`, so they follow the surrounding tex
 
 ## Customization & Theme Config
 
-You can fully customize the color scheme using **CSS Custom Properties** (recommended) or the `theme` prop.
+You can fully customize the color scheme using **CSS Custom Properties** — the only theming mechanism since v5.
 
 ### CSS variable reference
 
-Input variables (set them wherever the header lives — `:root`, a wrapper, or the `theme` prop):
+Input variables (set them wherever the header lives — `:root`, a wrapper, or a per-instance scope):
 
 | Variable | Used for | Light default | Dark default |
 | --- | --- | --- | --- |
@@ -530,6 +601,7 @@ Input variables (set them wherever the header lives — `:root`, a wrapper, or t
 | `--l-text` / `--d-text` | Text, hamburger lines, icons | `#1a1a1a` | `#ffffff` |
 | `--l-accent` / `--d-accent` | Hover underline, active links, dashed borders | `#3e1c71` | `#00ffff` |
 | `--l-blur` / `--d-blur` | `backdrop-filter` value | `blur(20px)` | `blur(20px)` |
+| `--header-z-index` | Stacking level of the fixed container | `10` | `10` |
 
 Derived variables (resolved by the component per theme state; override them only if you need to target internals directly):
 
@@ -541,7 +613,7 @@ Derived variables (resolved by the component per theme state; override them only
 | `--accent-color` | `--l-accent` or `--d-accent` |
 | `--backdrop-blur` | `--l-blur` or `--d-blur` |
 
-### Option 1: Native CSS Variables (Recommended)
+### Setting the variables
 
 ```css
 :root {
@@ -558,37 +630,18 @@ Derived variables (resolved by the component per theme state; override them only
   --d-bg-opaque: #0a0a0a;
   --d-text: #f5f5f5;
   --d-blur: blur(20px);
+
+  /* Stacking */
+  --header-z-index: 60;
 }
 ```
 
 The hamburger lines and the sun/chevron icons follow `--l-text` / `--d-text`, so text color drives them too. The moon glyph keeps its own white fill (`--svg-color--fff`, default `#fff`).
 
-### Option 2: JS Theme Prop
-
-```astro
----
-import { defaultThemes } from '@sofidevo/astro-dynamic-header';
-
-const theme = {
-  light: {
-    ...defaultThemes.light,
-    accentColor: "#7c3aed",
-    backgroundColor: "rgba(255, 255, 255, 0.85)",
-  },
-  dark: {
-    ...defaultThemes.dark,
-    accentColor: "#a78bfa",
-  }
-};
----
-
-<Header theme={theme} />
-```
-
-The prop writes the variables as inline styles on the header element, so it wins over `:root` values for that instance.
+Because there are no inline styles, your own layered CSS always beats these defaults — override any variable on a wrapper to scope it to one instance (see [z-index and per-instance tokens](#example-z-index-and-per-instance-tokens)).
 
 > [!IMPORTANT]
-> When using transparent backgrounds, always supply a solid fallback in `backgroundColorOpaque`. Submenus and mobile panels utilize this solid color to prevent visual glitches with nested blur effects.
+> When using transparent backgrounds, always supply a solid fallback in `--l-bg-opaque` / `--d-bg-opaque`. Submenus and mobile panels utilize this solid color to prevent visual glitches with nested blur effects.
 
 ---
 
@@ -663,11 +716,13 @@ import ChevronIcon from '@sofidevo/astro-dynamic-header/ChevronIcon';
 
 Check these in order:
 
+0. **Which version is installed?** Run `npm ls @sofidevo/astro-dynamic-header` (or the pnpm/yarn equivalent). v3.x ships unlayered styles that beat every layered override, so no amount of `@layer utilities` or Tailwind classes can win. Update to the latest version — in dev, the component logs a console warning when it detects this.
 1. **Which layer is your rule in?** Overrides belong in `@layer utilities`, or in a class passed through `classNames`. Rules in `@layer base` (and your resets) lose to the component by design.
-2. **Are you fighting the inline z-index?** `container` always renders `style="z-index: N"`. Use `theme.zIndex` instead of a z-index utility.
+2. **Did your CSS create `utilities` before the layer order statement ran?** Layers are ordered by their *first appearance* in the document; a later statement cannot reorder them. If your global CSS uses `@layer` but no statement comes first, add `@layer theme, base, components, utilities;` as its very first line (Tailwind v4 already emits this). In dev, the component logs a console warning with the exact fix when it detects this ordering.
 3. **Are you selecting the right hook?** See the [internal class hooks](#internal-class-hooks) table; plain class selectors are enough (you do not need `data-astro-cid-*`).
-4. **Is an inline style winning?** Inline styles beat every non-`!important` declaration, layered or not. The header renders inline styles for `z-index` and for any `theme` values you pass.
-5. **Tailwind v4?** Its layer order matches this component exactly, so utilities work automatically. Make sure `@import "tailwindcss"` comes first in your entry CSS.
+4. **Tailwind v4?** Its layer order matches this component exactly, so utilities work automatically. Make sure `@import "tailwindcss"` comes first in your entry CSS.
+
+Since v5 the component renders no inline styles at all — CSS variables (`--l-*`, `--d-*`, `--header-z-index`) and `@layer utilities` always win.
 
 ### Preflight changed my nav link colors (Tailwind v3)
 
@@ -694,7 +749,13 @@ Icons are rendered as inline SVG components. If you are upgrading from `v1.x` or
 
 ### The header sits behind my other content
 
-Set a z-index through the `theme` prop (`theme={{ light: { zIndex: 60 } }}`), not through a class on `container`. See [z-index and per-instance tokens](#example-z-index-and-per-instance-tokens-with-the-theme-prop).
+Raise it with `--header-z-index` (globally, on a wrapper, or via `classNames.container="z-50"` — utilities win since there is no inline z-index):
+
+```css
+:root {
+  --header-z-index: 60;
+}
+```
 
 ---
 

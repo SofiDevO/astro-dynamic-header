@@ -1,14 +1,12 @@
-export { defaultThemes } from "./defaults.js";
-
 /**
- * Represents a menu item in the navigation.
+ * Represents a menu item in the navigation (top level).
  */
 export interface MenuItemType {
-  /** The URL path for the link */
+  /** The URL path for the link. */
   link: string;
-  /** The text label to display */
+  /** The text label to display. */
   text: string;
-  /** Optional nested submenu items */
+  /** Optional nested submenu items. */
   submenu?: MenuItemType[];
 }
 
@@ -16,9 +14,9 @@ export interface MenuItemType {
  * Represents a third-level menu item.
  */
 export interface TertiaryMenuItem {
-  /** The URL path for the link */
+  /** The URL path for the link. */
   link: string;
-  /** The text label to display */
+  /** The text label to display. */
   text: string;
 }
 
@@ -26,28 +24,50 @@ export interface TertiaryMenuItem {
  * Represents a second-level menu item with optional nested tertiary items.
  */
 export interface SecondaryMenuItem {
-  /** The URL path for the link */
+  /** The URL path for the link. */
   link: string;
-  /** The text label to display */
+  /** The text label to display. */
   text: string;
-  /** Optional nested tertiary menu items */
+  /** Optional nested tertiary menu items. */
   submenu?: TertiaryMenuItem[];
 }
 
 /**
  * Represents a top-level menu item with optional nested secondary items.
+ *
+ * @example
+ * ```ts
+ * const item: MenuItem = {
+ *   link: "/services",
+ *   text: "Services",
+ *   submenu: [
+ *     { link: "/design", text: "Design", submenu: [{ link: "/ux", text: "UX" }] },
+ *   ],
+ * };
+ * ```
  */
 export interface MenuItem {
-  /** The URL path for the link */
+  /** The URL path for the link. */
   link: string;
-  /** The text label to display */
+  /** The text label to display. */
   text: string;
-  /** Optional nested secondary menu items */
+  /** Optional nested secondary menu items. */
   submenu?: SecondaryMenuItem[];
 }
 
 /**
  * Configuration for the main navigation.
+ *
+ * @example
+ * ```astro
+ * <Header
+ *   navigation={{
+ *     homeUrl: "/",
+ *     menuItems: [{ link: "/about", text: "About" }],
+ *     menu__link__class: "hover:underline hover:text-purple-400",
+ *   }}
+ * />
+ * ```
  */
 export interface NavConfig {
   /**
@@ -75,54 +95,18 @@ export interface NavConfig {
   header__item__class?: string;
   /**
    * Fine-grained class override applied to every top-level `<a>` link
-   * in the desktop navigation.
+   * in the desktop navigation. This is the place for hover styles: the
+   * classes live in `@layer utilities`, so they beat the component's
+   * default link styles without `!important`.
    * @example "hover:underline font-medium"
+   * @example Plain CSS equivalent:
+   * ```css
+   * @layer utilities {
+   *   #header-menu a:hover { color: var(--d-accent, #00ffff); }
+   * }
+   * ```
    */
   menu__link__class?: string;
-}
-
-/**
- * Individual theme settings for a specific state (light/dark).
- */
-export interface ThemeConfig {
-  /**
-   * Main background color. Supports hex, rgb, rgba, etc.
-   * @example "rgba(255, 255, 255, 0.9)"
-   */
-  backgroundColor?: string;
-  /**
-   * Solid background color for submenus and mobile panels to ensure readability.
-   * @example "#ffffff"
-   */
-  backgroundColorOpaque?: string;
-  /**
-   * CSS backdrop-filter blur value.
-   * @default "blur(20px)"
-   */
-  backdropBlur?: string;
-  /**
-   * CSS z-index for the header container.
-   * @default 10
-   */
-  zIndex?: number;
-  /**
-   * Primary text color for navigation and logo.
-   */
-  textColor?: string;
-  /**
-   * Color for highlights, active states, underscores, and small borders.
-   */
-  accentColor?: string;
-}
-
-/**
- * Combined theme configuration for both light and dark modes.
- */
-export interface DualThemeConfig {
-  /** Settings applied when light mode is active. */
-  light?: ThemeConfig;
-  /** Settings applied when dark mode is active. */
-  dark?: ThemeConfig;
 }
 
 /**
@@ -139,6 +123,23 @@ export interface DualThemeConfig {
  * @example
  * ```astro
  * <Header classNames={{ header: "shadow-xl", container: "top-4 px-6" }} />
+ * ```
+ *
+ * @example Tailwind hover states work out of the box:
+ * ```astro
+ * <Header classNames={{ header: "hover:shadow-2xl transition-shadow" }} />
+ * ```
+ *
+ * @example With plain CSS, define your class in `@layer utilities` (hover
+ * included) so it beats the component:
+ * ```astro
+ * <Header classNames={{ header: "custom-header-bg" }} />
+ * <style is:inline>
+ *   @layer utilities {
+ *     .custom-header-bg { background-color: red; }
+ *     .custom-header-bg:hover { background-color: darkred; }
+ *   }
+ * </style>
  * ```
  */
 export interface HeaderClassNames {
@@ -160,6 +161,9 @@ export type CustomClassNames = HeaderClassNames;
 
 /**
  * Main properties for the Header component.
+ *
+ * Colors, blur, and z-index are plain CSS variables — see the README
+ * "CSS variable reference". There is no `theme` prop (removed in v5).
  */
 export interface HeaderProps {
   /**
@@ -167,6 +171,10 @@ export interface HeaderProps {
    * - "floating": Centered with max-width and rounded corners.
    * - "fullscreen": Full width with no border radius.
    * @default "floating"
+   * @example
+   * ```astro
+   * <Header headerType="fullscreen" />
+   * ```
    */
   headerType?: "floating" | "fullscreen";
   /**
@@ -175,42 +183,78 @@ export interface HeaderProps {
    * - "dark": Force dark mode.
    * - "auto": Detects .dark class on the root element.
    * @default "auto"
+   * @example
+   * ```astro
+   * <Header preset="dark" />
+   * ```
    */
   preset?: "light" | "dark" | "auto";
 
-  /** Navigation links and structure. */
+  /**
+   * Navigation links and structure.
+   * @example
+   * ```astro
+   * <Header navigation={{ menuItems: [{ link: "/about", text: "About" }] }} />
+   * ```
+   */
   navigation?: NavConfig;
-  /** Custom theme overrides. See {@link DualThemeConfig} */
-  theme?: DualThemeConfig;
   /**
    * High-level CSS class overrides for structural wrapper elements.
    * For fine-grained nav/logo element classes, use the nested `xxx__class`
    * props inside `navigation` or `logo` instead.
-   * @example { header: "shadow-lg", container: "top-4" }
+   * @example
+   * ```astro
+   * <Header classNames={{ header: "shadow-lg bg-red-500", container: "top-4" }} />
+   * ```
    */
   classNames?: HeaderClassNames;
 }
 
+/**
+ * Properties for the standalone {@link '/NavMenu'} desktop navigation
+ * component (the Header renders it internally).
+ */
 export interface NavMenuProps {
+  /** Layout variant, matches `HeaderProps.headerType`. */
   type?: "floating" | "fullscreen";
+  /** Top-level menu items with nested submenus. */
   menuItems?: MenuItem[];
+  /** Whether to render the home link (hidden automatically on `/`). */
   showHomeLink?: boolean;
+  /** Label for the home link. */
   homeText?: string;
+  /** Class override for the desktop `<nav>` element. */
   header__menu__class?: string;
+  /** Class override for every top-level `<li>`. */
   header__item__class?: string;
+  /** Class override for every top-level `<a>` — hover styles live here. */
   menu__link__class?: string;
 }
 
+/**
+ * Properties for the standalone {@link '/MobileNav'} slide-in panel
+ * (the Header renders it internally).
+ */
 export interface MobileNavProps {
+  /** Layout variant, matches `HeaderProps.headerType`. */
   type?: "floating" | "fullscreen";
+  /** Top-level menu items with nested submenus. */
   menuItems?: MenuItem[];
+  /** Whether to render the home link (hidden automatically on `/`). */
   showHomeLink?: boolean;
+  /** Label for the home link. */
   homeText?: string;
+  /** Class override for the mobile panel `<nav>`. */
   mobileNav__class?: string;
+  /** Accent color used by the panel's active states and icons. */
   accentColor?: string;
 }
 
+/**
+ * Properties for the standalone {@link '/HamburgerButton'} (the Header
+ * renders it internally on mobile viewports).
+ */
 export interface HamburgerButtonProps {
+  /** Text/stroke color; defaults to the current text color. */
   color?: string;
 }
-

@@ -1,0 +1,131 @@
+---
+export interface Props {
+  /** Step chip and heading shown in the copy column. */
+  title: string;
+  /** Source code rendered in the code column. */
+  code: string;
+  /** Language label shown on the code card header. */
+  lang?: string;
+  /** Step number chip, e.g. "01". */
+  step?: string;
+  /** Swap columns: code on the left, copy on the right (desktop only). */
+  reversed?: boolean;
+}
+
+const { title, code, lang = "astro", step, reversed = false } = Astro.props;
+---
+
+<section
+  class:list={["usage-example", reversed && "usage-example--reversed"]}
+>
+  <div class="usage-example__copy">
+    {step && <span class="usage-example__step">{step}</span>}
+    <h2>{title}</h2>
+    <div class="usage-example__text">
+      <slot />
+    </div>
+  </div>
+
+  <figure class="usage-example__code">
+    <figcaption class="usage-example__lang">{lang}</figcaption>
+    <pre><code>{code}</code></pre>
+  </figure>
+</section>
+
+<style>
+  .usage-example {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding-inline: 1.5rem;
+    padding-block-end: 5rem;
+  }
+
+  .usage-example__copy {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-width: 34rem;
+  }
+
+  .usage-example__step {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--l-accent);
+    background: rgba(124, 58, 237, 0.1);
+    border-radius: 8px;
+  }
+
+  .usage-example h2 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .usage-example__text {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.7;
+  }
+
+  .usage-example__code {
+    /* Keep the pre from overflowing its flex item. */
+    flex: 1 1 auto;
+    min-width: 0;
+    margin: 0;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .usage-example__lang {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--l-accent);
+    background: rgba(124, 58, 237, 0.08);
+    border-bottom: 1px solid var(--border);
+    padding: 0.5rem 1rem;
+  }
+
+  .usage-example__code pre {
+    margin: 0;
+    padding: 1.1rem 1.25rem;
+    overflow-x: auto;
+    font-family: "Fira Code", "Cascadia Code", monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: var(--text);
+  }
+
+  /* Opt out of the global inline `code` chip styling. */
+  .usage-example__code code {
+    background: none;
+    color: inherit;
+    padding: 0;
+    border-radius: 0;
+    font-size: inherit;
+  }
+
+  @media (min-width: 768px) {
+    .usage-example {
+      flex-direction: row;
+      align-items: center;
+      gap: 3rem;
+    }
+
+    .usage-example--reversed {
+      flex-direction: row-reverse;
+    }
+  }
+</style>

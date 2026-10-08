@@ -1,0 +1,51 @@
+---
+import ExampleSection from "./ExampleSection.astro";
+
+const utilityClassesExample = `<Header
+  preset="dark"
+  classNames={{ header: "bg-red-500 shadow-xl" }}
+/>`;
+
+const plainCssExample = `<Header classNames={{ header: "custom-header-bg" }} />
+
+<style is:inline>
+  @layer utilities {
+    .custom-header-bg {
+      background-color: red;
+    }
+
+    .custom-header-bg:hover {
+      background-color: darkred;
+    }
+  }
+</style>`;
+---
+
+<ExampleSection
+  step="01"
+  title="Override with utility classes"
+  lang="astro"
+  code={utilityClassesExample}
+>
+  <p>
+    Pass any utility class through <code>classNames</code>. The component's
+    styles live in <code>@layer components</code> and yours in
+    <code>@layer utilities</code>, so yours always wins — no
+    <code>!important</code>, no <code>twMerge()</code>, and since v5 no
+    inline styles either.
+  </p>
+</ExampleSection>
+
+<ExampleSection
+  step="02"
+  title="Or bring your own CSS"
+  lang="css"
+  reversed
+  code={plainCssExample}
+>
+  <p>
+    Prefer plain CSS? Define your class inside <code>@layer utilities</code> —
+    the same layer Tailwind uses. Hover states, transitions, and everything
+    else work the same way.
+  </p>
+</ExampleSection>
