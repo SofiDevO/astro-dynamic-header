@@ -216,6 +216,7 @@ const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
       transition:
         background-color 0.3s ease,
         color 0.3s ease;
+        z-index: 200;
 
       @media (width < 768px) {
         align-self: flex-end;
@@ -285,7 +286,7 @@ const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
 
     .header--fullscreen {
       border-radius: 0;
-      padding: 1em 0.6rem;
+      padding:0.6rem 1em ;
 
       @media (width < 768px) {
         max-width: 100%;
