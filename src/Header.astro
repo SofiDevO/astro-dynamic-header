@@ -34,7 +34,7 @@ export interface Props {
    * <Header preset="dark" />
    * ```
    */
-  preset?: "light" | "dark" | "auto" | "none" ;
+  preset?: "light" | "dark" | "auto" | "none";
 
   /**
    * Navigation links, home link, and fine-grained classes for the desktop
@@ -79,7 +79,6 @@ export interface Props {
    */
   classNames?: HeaderClassNames;
   headerBg?: string;
-
 }
 
 const {
@@ -114,15 +113,13 @@ const {
   menu__link__class,
 } = navigation;
 
-
-
 let forcedClass = "";
 if (preset !== "none") {
   forcedClass = `header--force-${preset}`;
 }
 ---
 
-<style >
+<style>
   @layer theme, base, components, utilities;
 </style>
 
@@ -202,8 +199,11 @@ if (preset !== "none") {
   @layer theme, base, components, utilities;
 
   @layer components {
-    .header {
+    :root {
+      --header-bg:  rgba(255, 255, 255, 0.748);
+    }
 
+    .header {
       --bg-color: var(--l-bg, rgba(255, 255, 255, 0.748));
       --bg-color-opaque: var(--l-bg-opaque, rgba(255, 255, 255, 0.748));
       --text-color: var(--l-text, #1a1a1a);
@@ -221,7 +221,7 @@ if (preset !== "none") {
       transition:
         background-color 0.3s ease,
         color 0.3s ease;
-        z-index: 200;
+      z-index: 200;
 
       @media (width < 768px) {
         align-self: flex-end;
@@ -232,13 +232,13 @@ if (preset !== "none") {
 
     /* Automatic dark mode detection via root class */
     :root.dark .header:not(.header--force-light):not(.header--force-dark) {
-      --bg-color: var(--d-bg, rgba(0, 0, 0, 0.823));
+      --header-bg: rgba(0, 0, 0, 0.823);
+      --bg-color: var(--bg, rgba(0, 0, 0, 0.823));
       --bg-color-opaque: var(--d-bg-opaque, #0d0d0d);
       --text-color: var(--d-text, #ffffff);
       --accent-color: var(--d-accent, #00ffff);
       --backdrop-blur: var(--d-blur, blur(20px));
     }
-
 
     /* Forced themes: higher specificity than .header, no !important needed */
     .header.header--force-dark {
@@ -251,25 +251,21 @@ if (preset !== "none") {
     }
 
     .header.header--force-light {
-      --bg-color: var(--l-bg,  rgba(255, 255, 255, 0.748));
+      --bg-color: var(--l-bg, rgba(255, 255, 255, 0.748));
       --bg-color-opaque: var(--l-bg-opaque, rgb(255, 255, 255));
       --text-color: var(--l-text, #1a1a1a);
       --accent-color: var(--l-accent, #3e1c71);
       --backdrop-blur: var(--l-blur, blur(30px));
       background-color: var(--bg-color);
     }
-    .dark{
-
-      --bg-color: var(--l-bg,  rgba(255, 255, 255, 0.748));
-
+    .dark {
     }
     .header.header--force-auto {
-      --bg-color: var(--l-bg);
       --bg-color-opaque: var(--l-bg-opaque, rgba(255, 255, 255, 0.748));
       --text-color: var(--l-text, #1a1a1a);
       --accent-color: var(--l-accent, #3e1c71);
       --backdrop-blur: var(--l-blur, blur(20px));
-      background-color: var(--bg-color);
+      background-color: var(--header-bg);
     }
 
     .header__container {
@@ -307,7 +303,7 @@ if (preset !== "none") {
 
     .header--fullscreen {
       border-radius: 0;
-      padding:0.6rem 1em ;
+      padding: 0.6rem 1em;
 
       @media (width < 768px) {
         max-width: 100%;
