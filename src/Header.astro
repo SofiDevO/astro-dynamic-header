@@ -233,6 +233,7 @@ const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
       --text-color: var(--d-text, #ffffff);
       --accent-color: var(--d-accent, #00ffff);
       --backdrop-blur: var(--d-blur, blur(20px));
+      background-color: var(--bg-color);
     }
 
     /* Forced themes: higher specificity than .header, no !important needed */
@@ -242,6 +243,7 @@ const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
       --text-color: var(--d-text, #ffffff);
       --accent-color: var(--d-accent, #00ffff);
       --backdrop-blur: var(--d-blur, blur(30px));
+      background-color: var(--bg-color);
     }
 
     .header.header--force-light {
@@ -250,6 +252,7 @@ const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
       --text-color: var(--l-text, #1a1a1a);
       --accent-color: var(--l-accent, #3e1c71);
       --backdrop-blur: var(--l-blur, blur(30px));
+      background-color: var(--bg-color);
     }
 
     .header__container {
