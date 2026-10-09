@@ -24,6 +24,7 @@ export interface Props {
    * - `"auto"` (default) — follows the `.dark` class on the root element.
    * - `"light"` — always render the light theme (`header--force-light`).
    * - `"dark"` — always render the dark theme (`header--force-dark`).
+   * -  `"none"` - disable completely the preset
    *
    * Colors are controlled with CSS variables (see the README "CSS variable
    * reference"), never with props.
@@ -78,7 +79,6 @@ export interface Props {
    * ```
    */
   classNames?: HeaderClassNames;
-  headerBg?: string;
 }
 
 const {
@@ -87,22 +87,6 @@ const {
   navigation = {},
   classNames = {},
 } = Astro.props;
-
-if (import.meta.env.DEV) {
-  const removedThemeProp = (Astro.props as Record<string, unknown>).theme;
-
-  if (removedThemeProp !== undefined) {
-    console.warn(
-      "[@sofidevo/astro-dynamic-header] BREAKING CHANGE: The 'theme' prop was removed in v5. Set the same tokens as CSS variables instead: --l-bg / --d-bg, --l-bg-opaque / --d-bg-opaque, --l-text / --d-text, --l-accent / --d-accent, --l-blur / --d-blur, and --header-z-index for the container z-index. See the README 'CSS variable reference'.",
-    );
-  }
-
-  if (Array.isArray(navigation)) {
-    console.warn(
-      "[@sofidevo/astro-dynamic-header] BREAKING CHANGE: The 'navigation' prop now expects an object with 'menuItems'. Please use navigation={{ menuItems: [...] }} instead.",
-    );
-  }
-}
 
 // Navigation configuration
 const {
@@ -119,7 +103,7 @@ if (preset !== "none") {
 }
 ---
 
-<style>
+<style is:inline>
   @layer theme, base, components, utilities;
 </style>
 
@@ -188,141 +172,6 @@ if (preset !== "none") {
   </header>
 </div>
 
-<style is:inline>
-  /*
-   * Cascade layers keep this component overridable:
-   *   base (resets/preflight) < components (ours) < utilities (your classNames)
-   * The order statement below fixes that order before any layer of ours is
-   * used; the dev-only diagnostic warns when a consumer's CSS created the
-   * layers in a different order first. No `!important` is needed to override us.
-   */
-  @layer theme, base, components, utilities;
-
-  @layer components {
-    :root {
-      --header-bg:  rgba(255, 255, 255, 0.748);
-    }
-
-    .header {
-      --bg-color: var(--l-bg, rgba(255, 255, 255, 0.748));
-      --bg-color-opaque: var(--l-bg-opaque, rgba(255, 255, 255, 0.748));
-      --text-color: var(--l-text, #1a1a1a);
-      --accent-color: var(--l-accent, #3e1c71);
-      --backdrop-blur: var(--l-blur, blur(20px));
-
-      display: flex;
-      align-items: center;
-      width: 100%;
-      justify-content: space-between;
-      padding: 1em 2em;
-      backdrop-filter: var(--backdrop-blur);
-      -webkit-backdrop-filter: var(--backdrop-blur);
-      color: var(--text-color);
-      transition:
-        background-color 0.3s ease,
-        color 0.3s ease;
-      z-index: 200;
-
-      @media (width < 768px) {
-        align-self: flex-end;
-        padding: 0.4em;
-        margin: 0 auto;
-      }
-    }
-
-    /* Automatic dark mode detection via root class */
-    :root.dark .header:not(.header--force-light):not(.header--force-dark) {
-      --header-bg: rgba(0, 0, 0, 0.823);
-      --bg-color: var(--bg, rgba(0, 0, 0, 0.823));
-      --bg-color-opaque: var(--d-bg-opaque, #0d0d0d);
-      --text-color: var(--d-text, #ffffff);
-      --accent-color: var(--d-accent, #00ffff);
-      --backdrop-blur: var(--d-blur, blur(20px));
-    }
-
-    /* Forced themes: higher specificity than .header, no !important needed */
-    .header.header--force-dark {
-      --bg-color: var(--d-bg, rgba(0, 0, 0, 0.823));
-      --bg-color-opaque: var(--d-bg-opaque, #000000d9);
-      --text-color: var(--d-text, #ffffff);
-      --accent-color: var(--d-accent, #00ffff);
-      --backdrop-blur: var(--d-blur, blur(30px));
-      background-color: var(--bg-color);
-    }
-
-    .header.header--force-light {
-      --bg-color: var(--l-bg, rgba(255, 255, 255, 0.748));
-      --bg-color-opaque: var(--l-bg-opaque, rgb(255, 255, 255));
-      --text-color: var(--l-text, #1a1a1a);
-      --accent-color: var(--l-accent, #3e1c71);
-      --backdrop-blur: var(--l-blur, blur(30px));
-      background-color: var(--bg-color);
-    }
-    .dark {
-    }
-    .header.header--force-auto {
-      --bg-color-opaque: var(--l-bg-opaque, rgba(255, 255, 255, 0.748));
-      --text-color: var(--l-text, #1a1a1a);
-      --accent-color: var(--l-accent, #3e1c71);
-      --backdrop-blur: var(--l-blur, blur(20px));
-      background-color: var(--header-bg);
-    }
-
-    .header__container {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin: 0 auto;
-      position: fixed;
-      z-index: var(--header-z-index, 10);
-
-      @media (width < 768px) {
-        justify-content: flex-end;
-        align-items: flex-end;
-      }
-    }
-
-    .header__container--floating {
-      padding: 0.5em;
-    }
-
-    .header__container--fullscreen {
-      padding: 0;
-    }
-
-    .header--floating {
-      max-width: 1100px;
-      border-radius: 20px;
-      padding: 0.7em 1em;
-
-      @media (width < 768px) {
-        max-width: 95%;
-      }
-    }
-
-    .header--fullscreen {
-      border-radius: 0;
-      padding: 0.6rem 1em;
-
-      @media (width < 768px) {
-        max-width: 100%;
-        padding: 0.8em 1em;
-      }
-    }
-
-    .actions-desktop {
-      @media (width < 768px) {
-        display: none;
-      }
-    }
-
-    .actions-mobile {
-      margin-top: 20px;
-
-      @media (width >= 768px) {
-        display: none;
-      }
-    }
-  }
+<style>
+  @import "./styles/header.css";
 </style>

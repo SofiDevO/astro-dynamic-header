@@ -92,14 +92,14 @@ After (v5):
 }
 ```
 
-In dev, the component logs a migration warning when it detects the removed prop. The `DualThemeConfig` and `ThemeConfig` types and the `./defaults` export are gone; passing `theme` now fails type-checking.
+The `DualThemeConfig` and `ThemeConfig` types and the `./defaults` export are gone; passing `theme` now fails type-checking.
 
 ### 2. The container no longer renders an inline z-index
 
 | | v4.x | v5.0.0 |
 | --- | --- | --- |
 | Theming API | `theme` prop + CSS variables | CSS variables only |
-| Container z-index | inline `style="z-index: 10"` (no CSS could beat it) | `z-index: var(--header-z-index, 10)` in `@layer components` (utilities win) |
+| Container z-index | inline `style="z-index: 10"` (no CSS could beat it) | `z-index: var(--header-z-index, 200)` in `@layer components` (utilities win) |
 | `defaultThemes` | exported from `./defaults` | removed |
 
 z-index utilities passed as `classNames.container` (for example `"z-50"`) now work as expected.
@@ -478,7 +478,7 @@ Variables are inherited, so defining them on any ancestor of the header works.
 
 ### Example: z-index and per-instance tokens
 
-The container resolves its stacking level as `z-index: var(--header-z-index, 10)` inside `@layer components`, and there is no inline style — so z-index utilities passed as `classNames.container` win:
+The container resolves its stacking level as `z-index: var(--header-z-index, 200)` inside `@layer components`, and there is no inline style — so z-index utilities passed as `classNames.container` win:
 
 ```astro
 <Header classNames={{ container: "z-50" }} />
@@ -579,7 +579,7 @@ The sun and chevron icons use `currentColor`, so they follow the surrounding tex
 ### Styling caveats
 
 - **Layer order is fixed by first appearance.** If your plain-CSS overrides lose even from `@layer utilities`, put `@layer theme, base, components, utilities;` at the very top of your global stylesheet — the dev console warning points it out.
-- **There are no inline styles.** The container z-index is `var(--header-z-index, 10)` in `@layer components`, so utilities beat it.
+- **There are no inline styles.** The container z-index is `var(--header-z-index, 200)` in `@layer components`, so utilities beat it.
 - **`!important` in a layer still works** (important declarations reverse layer order), but you should not need it.
 - **Unlayered CSS beats everything layered.** If a global rule seems "too strong", that is why — move it into `@layer base`.
 - **Astro scopes component styles with `data-astro-cid-*` attributes.** Your selectors do not need them; plain class selectors work.
@@ -601,7 +601,7 @@ Input variables (set them wherever the header lives — `:root`, a wrapper, or a
 | `--l-text` / `--d-text` | Text, hamburger lines, icons | `#1a1a1a` | `#ffffff` |
 | `--l-accent` / `--d-accent` | Hover underline, active links, dashed borders | `#3e1c71` | `#00ffff` |
 | `--l-blur` / `--d-blur` | `backdrop-filter` value | `blur(20px)` | `blur(20px)` |
-| `--header-z-index` | Stacking level of the fixed container | `10` | `10` |
+| `--header-z-index` | Stacking level of the fixed container | `200` | `200` |
 
 Derived variables (resolved by the component per theme state; override them only if you need to target internals directly):
 
@@ -749,11 +749,12 @@ Icons are rendered as inline SVG components. If you are upgrading from `v1.x` or
 
 ### The header sits behind my other content
 
-Raise it with `--header-z-index` (globally, on a wrapper, or via `classNames.container="z-50"` — utilities win since there is no inline z-index):
+Adjust it with `--header-z-index` (globally, on a wrapper, or via `classNames.container="z-50"` — utilities win since there is no inline z-index):
 
 ```css
 :root {
-  --header-z-index: 60;
+  /* default is 200; raise it further if your content stacks higher */
+  --header-z-index: 300;
 }
 ```
 
