@@ -34,7 +34,7 @@ export interface Props {
    * <Header preset="dark" />
    * ```
    */
-  preset?: "light" | "dark" | "auto";
+  preset?: "light" | "dark" | "auto" | "none" ;
 
   /**
    * Navigation links, home link, and fine-grained classes for the desktop
@@ -116,7 +116,10 @@ const {
 
 
 
-const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
+let forcedClass = "";
+if (preset !== "none") {
+  forcedClass = `header--force-${preset}`;
+}
 ---
 
 <style >
@@ -233,6 +236,15 @@ const forcedClass = preset !== "auto" ? `header--force-${preset}` : "";
       --text-color: var(--d-text, #ffffff);
       --accent-color: var(--d-accent, #00ffff);
       --backdrop-blur: var(--d-blur, blur(20px));
+
+    }
+
+    .header.header--force-auto {
+      --bg-color: var(--l-bg);
+      --bg-color-opaque: var(--l-bg-opaque, rgba(255, 255, 255, 0.748));
+      --text-color: var(--l-text, #1a1a1a);
+      --accent-color: var(--l-accent, #3e1c71);
+      --backdrop-blur: var(--l-blur, blur(20px));
       background-color: var(--bg-color);
     }
 
