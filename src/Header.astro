@@ -203,7 +203,8 @@ if (preset !== "none") {
 
   @layer components {
     .header {
-      --bg-color: var(--l-bg);
+
+      --bg-color: var(--l-bg, rgba(255, 255, 255, 0.748));
       --bg-color-opaque: var(--l-bg-opaque, rgba(255, 255, 255, 0.748));
       --text-color: var(--l-text, #1a1a1a);
       --accent-color: var(--l-accent, #3e1c71);
@@ -236,17 +237,8 @@ if (preset !== "none") {
       --text-color: var(--d-text, #ffffff);
       --accent-color: var(--d-accent, #00ffff);
       --backdrop-blur: var(--d-blur, blur(20px));
-
     }
 
-    .header.header--force-auto {
-      --bg-color: var(--l-bg);
-      --bg-color-opaque: var(--l-bg-opaque, rgba(255, 255, 255, 0.748));
-      --text-color: var(--l-text, #1a1a1a);
-      --accent-color: var(--l-accent, #3e1c71);
-      --backdrop-blur: var(--l-blur, blur(20px));
-      background-color: var(--bg-color);
-    }
 
     /* Forced themes: higher specificity than .header, no !important needed */
     .header.header--force-dark {
@@ -264,6 +256,19 @@ if (preset !== "none") {
       --text-color: var(--l-text, #1a1a1a);
       --accent-color: var(--l-accent, #3e1c71);
       --backdrop-blur: var(--l-blur, blur(30px));
+      background-color: var(--bg-color);
+    }
+    .dark{
+
+      --bg-color: var(--l-bg,  rgba(255, 255, 255, 0.748));
+
+    }
+    .header.header--force-auto {
+      --bg-color: var(--l-bg);
+      --bg-color-opaque: var(--l-bg-opaque, rgba(255, 255, 255, 0.748));
+      --text-color: var(--l-text, #1a1a1a);
+      --accent-color: var(--l-accent, #3e1c71);
+      --backdrop-blur: var(--l-blur, blur(20px));
       background-color: var(--bg-color);
     }
 
